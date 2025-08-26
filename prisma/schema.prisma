@@ -1,0 +1,195 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ENUM for user roles
+enum UserRole {
+  STUDENT
+  INSTRUCTOR
+  ADMIN // Added for future scalability
+}
+
+// User model for authentication and roles
+model User {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  role           UserRole  @default(STUDENT)
+  bio            String? // Added for instructor profiles
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relationships
+  courses     Course[]     @relation("CourseInstructor")
+  enrollments Enrollment[]
+  reviews     Review[]
+  wishlist Wishlist[]
+
+  // NextAuth specific models
+  accounts Account[]
+  sessions Session[]
+}
+
+// NextAuth model
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+// NextAuth model
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Category model
+model Category {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  name    String   @unique
+  courses Course[]
+}
+
+// Course model
+model Course {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  description  String?
+  imageUrl     String?
+  price        Float?
+  isPublished  Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  instructorId String     @db.ObjectId
+  instructor   User       @relation("CourseInstructor", fields: [instructorId], references: [id])
+  categoryId   String?    @db.ObjectId
+  category     Category?  @relation(fields: [categoryId], references: [id])
+
+  // Relationships
+  chapters     Chapter[]
+  enrollments  Enrollment[]
+  reviews      Review[]
+    wishlist Wishlist[]
+
+}
+
+// Chapter model - NEW!
+model Chapter {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  position    Int
+  isPublished Boolean  @default(false)
+  isFree      Boolean  @default(false)
+  
+  courseId    String   @db.ObjectId
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  // Relationships
+  lessons     Lesson[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Lesson model - Updated to belong to a Chapter
+model Lesson {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  videoUrl    String?
+  position    Int
+  isPublished Boolean  @default(false)
+  isFree      Boolean  @default(false)
+
+
+  chapterId   String   @db.ObjectId
+  chapter     Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  // Relationships
+  progress    UserProgress[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Enrollment model
+model Enrollment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  courseId  String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+// UserProgress model - Updated for clarity
+model UserProgress {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  isCompleted Boolean  @default(false)
+
+  userId      String   @db.ObjectId
+  lessonId    String   @db.ObjectId
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, lessonId])
+}
+
+// Review model
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String   @db.ObjectId
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model Wishlist {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  courseId  String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId]) // A user can only wishlist a course once
+}
