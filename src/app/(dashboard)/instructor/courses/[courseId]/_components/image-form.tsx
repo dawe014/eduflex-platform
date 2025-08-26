@@ -1,15 +1,15 @@
-// File: src/app/(dashboard)/instructor/courses/[courseId]/_components/image-form.tsx
 "use client";
 
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ImageIcon, Pencil, PlusCircle } from "lucide-react";
+import { ImageIcon, Pencil, PlusCircle, X, Check } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Course } from "@prisma/client";
 import Image from "next/image";
 import { FileUpload } from "@/components/file-upload";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ImageFormProps {
   initialData: Course;
@@ -24,75 +24,118 @@ const formSchema = z.object({
 
 export const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const router = useRouter();
 
   const toggleEdit = () => setIsEditing((current) => !current);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      setIsUploading(true);
       await fetch(`/api/courses/${courseId}`, {
         method: "PATCH",
         body: JSON.stringify(values),
         headers: { "Content-Type": "application/json" },
       });
-      toast.success("Course image updated");
+      toast.success("Course image updated successfully");
       toggleEdit();
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Failed to update image");
+    } finally {
+      setIsUploading(false);
     }
   };
 
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
-      <div className="font-medium flex items-center justify-between">
-        Course image
-        <Button onClick={toggleEdit} variant="ghost">
-          {isEditing && <>Cancel</>}
-          {!isEditing && !initialData.imageUrl && (
+    <Card className="border-0 shadow-lg">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-purple-100 rounded-lg">
+            <ImageIcon className="h-5 w-5 text-purple-600" />
+          </div>
+          <CardTitle className="text-lg font-semibold">Course Image</CardTitle>
+        </div>
+        <Button
+          onClick={toggleEdit}
+          variant="ghost"
+          size="sm"
+          className="gap-2"
+          disabled={isUploading}
+        >
+          {isEditing ? (
             <>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add an image
+              <X className="h-4 w-4" />
+              Cancel
             </>
-          )}
-          {!isEditing && initialData.imageUrl && (
+          ) : initialData.imageUrl ? (
             <>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit image
+              <Pencil className="h-4 w-4" />
+              Change Image
+            </>
+          ) : (
+            <>
+              <PlusCircle className="h-4 w-4" />
+              Add Image
             </>
           )}
         </Button>
-      </div>
-      {!isEditing &&
-        (!initialData.imageUrl ? (
-          <div className="flex items-center justify-center h-60 bg-slate-200 rounded-md">
-            <ImageIcon className="h-10 w-10 text-slate-500" />
-          </div>
+      </CardHeader>
+      <CardContent>
+        {!isEditing ? (
+          !initialData.imageUrl ? (
+            <div className="flex flex-col items-center justify-center h-48 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+              <ImageIcon className="h-12 w-12 text-gray-400 mb-4" />
+              <p className="text-gray-500 text-sm mb-2">No image uploaded</p>
+              <Button onClick={toggleEdit} variant="outline" size="sm">
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Upload Image
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="relative aspect-video rounded-lg overflow-hidden bg-black">
+                <Image
+                  alt="Course image"
+                  fill
+                  className="object-cover"
+                  src={initialData.imageUrl}
+                />
+              </div>
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <span>Image ready for display</span>
+                <Button variant="outline" size="sm" onClick={toggleEdit}>
+                  Change Image
+                </Button>
+              </div>
+            </div>
+          )
         ) : (
-          <div className="relative aspect-video mt-2">
-            <Image
-              alt="Upload"
-              fill
-              className="object-cover rounded-md"
-              src={initialData.imageUrl}
-            />
+          <div className="space-y-4">
+            {isUploading && (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                <p className="text-sm text-gray-500">Uploading image...</p>
+              </div>
+            )}
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+              <FileUpload
+                endpoint="courseImage"
+                onChange={(url) => {
+                  if (url) {
+                    onSubmit({ imageUrl: url });
+                  }
+                }}
+                onUploadStart={() => setIsUploading(true)}
+                onUploadEnd={() => setIsUploading(false)}
+              />
+            </div>
+            <p className="text-xs text-gray-500">
+              16:9 aspect ratio recommended • Max size: 4MB
+            </p>
           </div>
-        ))}
-      {isEditing && (
-        <div>
-          <FileUpload
-            endpoint="courseImage"
-            onChange={(url) => {
-              if (url) {
-                onSubmit({ imageUrl: url });
-              }
-            }}
-          />
-          <div className="text-xs text-muted-foreground mt-4">
-            16:9 aspect ratio recommended
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };

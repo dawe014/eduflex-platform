@@ -1,4 +1,3 @@
-// File: src/app/(dashboard)/instructor/courses/[courseId]/_components/price-form.tsx
 "use client";
 
 import * as z from "zod";
@@ -13,12 +12,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, Check, X, DollarSign } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Course } from "@prisma/client";
-import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface PriceFormProps {
   initialData: Course;
@@ -26,7 +26,7 @@ interface PriceFormProps {
 }
 
 const formSchema = z.object({
-  price: z.coerce.number(), // coerce will convert string from input to number
+  price: z.coerce.number().min(0, "Price must be positive"),
 });
 
 export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
@@ -36,7 +36,7 @@ export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { price: initialData?.price || undefined },
+    defaultValues: { price: initialData?.price || 0 },
   });
 
   const { isSubmitting, isValid } = form.formState;
@@ -48,11 +48,11 @@ export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
         body: JSON.stringify(values),
         headers: { "Content-Type": "application/json" },
       });
-      toast.success("Course price updated");
+      toast.success("Course price updated successfully");
       toggleEdit();
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Failed to update price");
     }
   };
 
@@ -63,62 +63,92 @@ export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
     }).format(price);
 
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
-      <div className="font-medium flex items-center justify-between">
-        Course price
-        <Button onClick={toggleEdit} variant="ghost">
+    <Card className="border-0 shadow-lg">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-green-100 rounded-lg">
+            <DollarSign className="h-5 w-5 text-green-600" />
+          </div>
+          <CardTitle className="text-lg font-semibold">Course Price</CardTitle>
+        </div>
+        <Button
+          onClick={toggleEdit}
+          variant="ghost"
+          size="sm"
+          className="gap-2"
+        >
           {isEditing ? (
-            "Cancel"
+            <>
+              <X className="h-4 w-4" />
+              Cancel
+            </>
           ) : (
             <>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit price
+              <Pencil className="h-4 w-4" />
+              Edit Price
             </>
           )}
         </Button>
-      </div>
-      {!isEditing && (
-        <p
-          className={cn(
-            "text-sm mt-2",
-            !initialData.price && "text-slate-500 italic"
-          )}
-        >
-          {initialData.price ? formatPrice(initialData.price) : "No price set"}
-        </p>
-      )}
-      {isEditing && (
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 mt-4"
-          >
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      disabled={isSubmitting}
-                      placeholder="Set a price for your course"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex items-center gap-x-2">
-              <Button disabled={!isValid || isSubmitting} type="submit">
-                Save
-              </Button>
-            </div>
-          </form>
-        </Form>
-      )}
-    </div>
+      </CardHeader>
+      <CardContent>
+        {!isEditing ? (
+          <div className="space-y-2">
+            {initialData.price ? (
+              <p className="text-2xl font-bold text-gray-900">
+                {formatPrice(initialData.price)}
+              </p>
+            ) : (
+              <Badge variant="outline" className="bg-gray-100 text-gray-700">
+                Free Course
+              </Badge>
+            )}
+          </div>
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          disabled={isSubmitting}
+                          placeholder="0.00"
+                          className="pl-10 text-lg font-medium"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-center gap-2">
+                <Button
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  className="gap-2"
+                >
+                  <Check className="h-4 w-4" />
+                  Save Price
+                </Button>
+                <Button type="button" variant="outline" onClick={toggleEdit}>
+                  Cancel
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500">
+                Set to 0 to make this course free
+              </p>
+            </form>
+          </Form>
+        )}
+      </CardContent>
+    </Card>
   );
 };

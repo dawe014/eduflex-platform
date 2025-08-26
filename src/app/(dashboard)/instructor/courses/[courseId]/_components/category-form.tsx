@@ -1,4 +1,3 @@
-// File: src/app/(dashboard)/instructor/courses/[courseId]/_components/category-form.tsx
 "use client";
 
 import * as z from "zod";
@@ -13,12 +12,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, Check, X, Tag } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Course } from "@prisma/client";
-import { cn } from "@/lib/utils";
-import { ComboboxDemo } from "@/components/ui/combobox";
+import { ComboboxDemo } from "@/components/ui/combobox"; // ✅ your Combobox
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
 interface CategoryFormProps {
   initialData: Course;
   courseId: string;
@@ -26,7 +27,7 @@ interface CategoryFormProps {
 }
 
 const formSchema = z.object({
-  categoryId: z.string().min(1),
+  categoryId: z.string().min(1, "Category is required"),
 });
 
 export const CategoryForm = ({
@@ -52,11 +53,11 @@ export const CategoryForm = ({
         body: JSON.stringify(values),
         headers: { "Content-Type": "application/json" },
       });
-      toast.success("Course category updated");
+      toast.success("Course category updated successfully");
       toggleEdit();
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Failed to update category");
     }
   };
 
@@ -65,56 +66,87 @@ export const CategoryForm = ({
   );
 
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
-      <div className="font-medium flex items-center justify-between">
-        Course category
-        <Button onClick={toggleEdit} variant="ghost">
+    <Card className="border-0 shadow-lg">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-pink-100 rounded-lg">
+            <Tag className="h-5 w-5 text-pink-600" />
+          </div>
+          <CardTitle className="text-lg font-semibold">
+            Course Category
+          </CardTitle>
+        </div>
+        <Button
+          onClick={toggleEdit}
+          variant="ghost"
+          size="sm"
+          className="gap-2"
+        >
           {isEditing ? (
-            "Cancel"
+            <>
+              <X className="h-4 w-4" />
+              Cancel
+            </>
           ) : (
             <>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit category
+              <Pencil className="h-4 w-4" />
+              Edit Category
             </>
           )}
         </Button>
-      </div>
-      {!isEditing && (
-        <p
-          className={cn(
-            "text-sm mt-2",
-            !initialData.categoryId && "text-slate-500 italic"
-          )}
-        >
-          {selectedOption?.label || "No category"}
-        </p>
-      )}
-      {isEditing && (
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 mt-4"
-          >
-            <FormField
-              control={form.control}
-              name="categoryId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <ComboboxDemo options={options} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex items-center gap-x-2">
-              <Button disabled={!isValid || isSubmitting} type="submit">
-                Save
-              </Button>
-            </div>
-          </form>
-        </Form>
-      )}
-    </div>
+      </CardHeader>
+      <CardContent>
+        {!isEditing ? (
+          <div className="space-y-2">
+            {selectedOption ? (
+              <Badge
+                variant="outline"
+                className="bg-blue-50 text-blue-700 border-blue-200"
+              >
+                {selectedOption.label}
+              </Badge>
+            ) : (
+              <p className="text-gray-500 italic">No category selected</p>
+            )}
+          </div>
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="categoryId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <ComboboxDemo
+                        options={options}
+                        value={field.value}
+                        onChange={field.onChange} // ✅ fixes integration
+                        placeholder="Select a category..."
+                        emptyMessage="No categories found"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-center gap-2">
+                <Button
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  className="gap-2"
+                >
+                  <Check className="h-4 w-4" />
+                  Save Category
+                </Button>
+                <Button type="button" variant="outline" onClick={toggleEdit}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </Form>
+        )}
+      </CardContent>
+    </Card>
   );
 };

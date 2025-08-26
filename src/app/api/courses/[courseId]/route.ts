@@ -10,7 +10,7 @@ export async function PATCH(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    const { courseId } = params;
+    const { courseId } = await params;
     const values = await req.json();
 
     if (!session?.user) {

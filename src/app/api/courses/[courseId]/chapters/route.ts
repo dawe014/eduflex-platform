@@ -10,7 +10,7 @@ export async function POST(
   try {
     const session = await getServerSession(authOptions);
     const { title } = await req.json();
-    const { courseId } = params;
+    const { courseId } = await params;
 
     if (!session?.user || session.user.role !== "INSTRUCTOR") {
       return new NextResponse("Unauthorized", { status: 401 });

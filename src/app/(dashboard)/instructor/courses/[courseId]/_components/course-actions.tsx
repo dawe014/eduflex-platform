@@ -1,6 +1,7 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
+import { Trash, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -15,6 +16,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+
 interface CourseActionsProps {
   disabled: boolean;
   courseId: string;
@@ -29,21 +32,17 @@ export const CourseActions = ({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const onClick = async () => {
+  const onPublishToggle = async () => {
     try {
       setIsLoading(true);
-      if (isPublished) {
-        // Unpublish logic
-        await fetch(`/api/courses/${courseId}/unpublish`, { method: "PATCH" });
-        toast.success("Course unpublished");
-      } else {
-        // Publish logic
-        await fetch(`/api/courses/${courseId}/publish`, { method: "PATCH" });
-        toast.success("Course published");
-      }
+      const url = `/api/courses/${courseId}/${
+        isPublished ? "unpublish" : "publish"
+      }`;
+      await fetch(url, { method: "PATCH" });
+      toast.success(`Course ${isPublished ? "unpublished" : "published"}`);
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Failed to update course status");
     } finally {
       setIsLoading(false);
     }
@@ -53,35 +52,77 @@ export const CourseActions = ({
     try {
       setIsLoading(true);
       await fetch(`/api/courses/${courseId}`, { method: "DELETE" });
-      toast.success("Course deleted");
+      toast.success("Course deleted successfully");
       router.refresh();
-      router.push("/instructor/dashboard");
+      router.push("/instructor/courses");
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Failed to delete course");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center gap-x-2">
+    <div className="flex items-center gap-3">
+      <Badge
+        variant={isPublished ? "success" : "secondary"}
+        className="px-3 py-1"
+      >
+        {isPublished ? "Published" : "Draft"}
+      </Badge>
+
+      <Button
+        onClick={onPublishToggle}
+        disabled={disabled || isLoading}
+        variant={isPublished ? "outline" : "default"}
+        size="sm"
+        className="gap-2"
+      >
+        {isLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : isPublished ? (
+          <EyeOff className="h-4 w-4" />
+        ) : (
+          <Eye className="h-4 w-4" />
+        )}
+        {isPublished ? "Unpublish" : "Publish"}
+      </Button>
+
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button size="sm" disabled={isLoading}>
+          <Button
+            size="sm"
+            variant="destructive"
+            disabled={isLoading}
+            className="gap-2"
+          >
             <Trash className="h-4 w-4" />
+            Delete
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Course</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your
-              course.
+              Are you sure you want to delete this course? This action cannot be
+              undone and will permanently remove all course content, chapters,
+              and lessons.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onDelete}>Continue</AlertDialogAction>
+            <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={onDelete}
+              disabled={isLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 gap-2"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash className="h-4 w-4" />
+              )}
+              Delete Course
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

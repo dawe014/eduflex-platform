@@ -3,11 +3,9 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { User as UserIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -19,30 +17,37 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
+import { User } from "@prisma/client";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   bio: z.string().optional(),
 });
 
-export const ProfileForm = ({ user }) => {
+interface ProfileFormProps {
+  user: User;
+}
+
+export const ProfileForm = ({ user }: ProfileFormProps) => {
   const router = useRouter();
-  const form = useForm({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { name: user.name || "", bio: user.bio || "" },
   });
   const { isSubmitting } = form.formState;
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await fetch("/api/profile", {
+      const response = await fetch("/api/profile", {
         method: "PATCH",
         body: JSON.stringify(values),
+        headers: { "Content-Type": "application/json" },
       });
-      toast.success("Profile updated!");
+      if (!response.ok) throw new Error("Failed to update");
+      toast.success("Profile updated successfully!");
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
@@ -83,11 +88,11 @@ export const ProfileForm = ({ user }) => {
                 name="bio"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bio</FormLabel>
+                    <FormLabel>Instructor Bio</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="Tell us a little about your expertise"
+                        placeholder="Tell students about your expertise..."
                       />
                     </FormControl>
                     <FormMessage />

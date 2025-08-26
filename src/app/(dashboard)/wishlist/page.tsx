@@ -15,7 +15,13 @@ export default async function WishlistPage() {
   const wishlistItems = await db.wishlist.findMany({
     where: { userId: session.user.id },
     include: {
-      course: { include: { category: true, enrollments: true, reviews: true } },
+      course: {
+        include: {
+          category: true,
+          enrollments: true,
+          reviews: true,
+        },
+      },
     },
   });
 
@@ -30,9 +36,6 @@ export default async function WishlistPage() {
         <div className="text-center py-16 bg-white rounded-lg shadow-sm">
           <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
           <h2 className="text-xl font-semibold">Your Wishlist is Empty</h2>
-          <p className="text-muted-foreground mt-2">
-            Add courses you want to save for later.
-          </p>
           <Button asChild variant="default" className="mt-4">
             <Link href="/courses">Explore Courses</Link>
           </Button>

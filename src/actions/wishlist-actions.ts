@@ -7,7 +7,11 @@ import { revalidatePath } from "next/cache";
 
 export async function toggleWishlist(courseId: string, path: string) {
   const session = await getServerSession(authOptions);
-  if (!session?.user) throw new Error("Unauthorized");
+  if (!session?.user) {
+    throw new Error(
+      "Unauthorized: You must be logged in to wishlist a course."
+    );
+  }
 
   const userId = session.user.id;
 
@@ -19,11 +23,13 @@ export async function toggleWishlist(courseId: string, path: string) {
     await db.wishlist.delete({
       where: { userId_courseId: { userId, courseId } },
     });
+    revalidatePath(path);
+    return { message: "Removed from wishlist" };
   } else {
     await db.wishlist.create({
       data: { userId, courseId },
     });
+    revalidatePath(path);
+    return { message: "Added to wishlist" };
   }
-
-  revalidatePath(path); // Re-fetch data for the page you're on
 }

@@ -1,4 +1,6 @@
+// File: src/app/(dashboard)/admin/users/page.tsx
 import { Users } from "lucide-react";
+import { db } from "@/lib/db";
 import {
   Table,
   TableBody,
@@ -8,32 +10,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { UserActions } from "./_components/user-actions";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export default async function ManageUsersPage() {
-  // TODO: Fetch all users with pagination
-  const users = [
-    {
-      id: "1",
-      name: "Alice Johnson",
-      email: "alice@example.com",
-      role: "STUDENT",
-      createdAt: new Date(),
-    },
-    {
-      id: "2",
-      name: "Bob Smith",
-      email: "bob@example.com",
-      role: "INSTRUCTOR",
-      createdAt: new Date(),
-    },
-    {
-      id: "3",
-      name: "Charlie Brown",
-      email: "charlie@example.com",
-      role: "STUDENT",
-      createdAt: new Date(),
-    },
-  ];
+  const session = await getServerSession(authOptions);
+  const users = await db.user.findMany({ orderBy: { createdAt: "desc" } });
 
   return (
     <div className="container mx-auto p-4 md:p-6">
@@ -50,6 +33,7 @@ export default async function ManageUsersPage() {
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Joined</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -58,21 +42,19 @@ export default async function ManageUsersPage() {
                 <TableCell className="font-medium">{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
-                  <Badge
-                    variant={
-                      user.role === "INSTRUCTOR" ? "default" : "secondary"
-                    }
-                  >
-                    {user.role}
-                  </Badge>
+                  <Badge>{user.role}</Badge>
                 </TableCell>
                 <TableCell>{user.createdAt.toLocaleDateString()}</TableCell>
+                <TableCell className="text-right">
+                  {user.id !== session?.user.id && (
+                    <UserActions userId={user.id} currentRole={user.role} />
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
-      {/* TODO: Add pagination controls */}
     </div>
   );
 }

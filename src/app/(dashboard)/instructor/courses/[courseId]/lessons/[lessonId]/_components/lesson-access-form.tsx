@@ -1,3 +1,4 @@
+// File: .../_components/lesson-access-form.tsx
 "use client";
 
 import * as z from "zod";
@@ -12,16 +13,18 @@ import {
   FormItem,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, Check, X, Crown } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Lesson } from "@prisma/client";
-import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface LessonAccessFormProps {
   initialData: Lesson;
   courseId: string;
+  chapterId: string;
   lessonId: string;
 }
 
@@ -32,6 +35,7 @@ const formSchema = z.object({
 export const LessonAccessForm = ({
   initialData,
   courseId,
+  chapterId,
   lessonId,
 }: LessonAccessFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -60,65 +64,91 @@ export const LessonAccessForm = ({
   };
 
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
-      <div className="font-medium flex items-center justify-between">
-        Lesson access
-        <Button onClick={toggleEdit} variant="ghost">
+    <Card className="border-0 shadow-lg">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-amber-100 rounded-lg">
+            <Crown className="h-5 w-5 text-amber-600" />
+          </div>
+          <CardTitle className="text-lg font-semibold">
+            Access Settings
+          </CardTitle>
+        </div>
+        <Button
+          onClick={toggleEdit}
+          variant="ghost"
+          size="sm"
+          className="gap-2"
+        >
           {isEditing ? (
-            "Cancel"
+            <>
+              <X className="h-4 w-4" />
+              Cancel
+            </>
           ) : (
             <>
-              <Pencil className="h-4 w-4 mr-2" /> Edit access
+              <Pencil className="h-4 w-4" />
+              Edit Access
             </>
           )}
         </Button>
-      </div>
-      {!isEditing && (
-        <p
-          className={cn(
-            "text-sm mt-2",
-            !initialData.isFree && "text-slate-500 italic"
-          )}
-        >
-          {initialData.isFree
-            ? "This lesson is a free preview."
-            : "This lesson is not free."}
-        </p>
-      )}
-      {isEditing && (
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 mt-4"
-          >
-            <FormField
-              control={form.control}
-              name="isFree"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                  <div className="space-y-0.5">
-                    <FormDescription>
-                      Check this box if you want to make this lesson free for
-                      preview.
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <div className="flex items-center gap-x-2">
-              <Button disabled={!isValid || isSubmitting} type="submit">
-                Save
-              </Button>
-            </div>
-          </form>
-        </Form>
-      )}
-    </div>
+      </CardHeader>
+      <CardContent>
+        {!isEditing ? (
+          <div className="space-y-2">
+            <Badge variant={initialData.isFree ? "success" : "secondary"}>
+              {initialData.isFree ? "Free Preview" : "Premium Content"}
+            </Badge>
+            <p className="text-sm text-gray-600">
+              {initialData.isFree
+                ? "This lesson is available as a free preview for all visitors."
+                : "This lesson requires course enrollment to access."}
+            </p>
+          </div>
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="isFree"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 bg-gray-50">
+                    <div className="space-y-0.5">
+                      <FormDescription className="text-base font-medium">
+                        Free Preview
+                      </FormDescription>
+                      <FormDescription className="text-sm">
+                        Enable free preview to allow anyone to watch this lesson
+                        without enrollment
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={isSubmitting}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-center gap-2">
+                <Button
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  className="gap-2"
+                >
+                  <Check className="h-4 w-4" />
+                  Save Changes
+                </Button>
+                <Button type="button" variant="outline" onClick={toggleEdit}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </Form>
+        )}
+      </CardContent>
+    </Card>
   );
 };
