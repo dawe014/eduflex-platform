@@ -40,3 +40,53 @@ export async function createCourse(formData: FormData) {
   revalidatePath("/instructor/dashboard");
   redirect(`/instructor/dashboard`);
 }
+
+// Admin function to toggle the publication status of any course
+export async function toggleCoursePublishByAdmin(courseId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user || session.user.role !== "ADMIN") {
+    throw new Error("Forbidden: Admins only.");
+  }
+
+  const course = await db.course.findUnique({ where: { id: courseId } });
+  if (!course) {
+    throw new Error("Course not found.");
+  }
+
+  const updatedCourse = await db.course.update({
+    where: { id: courseId },
+    data: { isPublished: !course.isPublished },
+  });
+
+  revalidatePath("/admin/courses");
+  return {
+    success: true,
+    message: `Course has been ${
+      updatedCourse.isPublished ? "published" : "unpublished"
+    }.`,
+  };
+}
+
+// Admin function to delete any course
+export async function deleteCourseByAdmin(courseId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user || session.user.role !== "ADMIN") {
+    throw new Error("Forbidden: Admins only.");
+  }
+
+  const course = await db.course.findUnique({ where: { id: courseId } });
+  if (!course) {
+    throw new Error("Course not found.");
+  }
+
+  // Prisma's cascade delete will handle related chapters, lessons, enrollments, etc.
+  const deletedCourse = await db.course.delete({
+    where: { id: courseId },
+  });
+
+  revalidatePath("/admin/courses");
+  return {
+    success: true,
+    message: `Course "${deletedCourse.title}" has been deleted.`,
+  };
+}

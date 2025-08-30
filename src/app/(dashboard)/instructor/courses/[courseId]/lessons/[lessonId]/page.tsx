@@ -23,6 +23,7 @@ import { LessonActions } from "./_components/lesson-actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { LessonDurationForm } from "./_components/lesson-duration-form";
 
 export default async function LessonIdPage({
   params,
@@ -71,14 +72,19 @@ export default async function LessonIdPage({
   // The chapterId is now available from the fetched lesson data
   const chapterId = lesson.chapter.id;
 
-  const requiredFields = [lesson.title, lesson.description, lesson.videoUrl];
+  const requiredFields = [
+    lesson.title,
+    lesson.description,
+    lesson.videoUrl,
+    lesson.duration,
+  ];
   const totalFields = requiredFields.length;
   const completedFields = requiredFields.filter(Boolean).length;
   const completionPercentage = (completedFields / totalFields) * 100;
   const isComplete = requiredFields.every(Boolean);
 
   // Placeholder for duration
-  const formattedDuration = lesson.videoUrl ? "Set" : "Not set";
+  const formattedDuration = lesson.duration ? lesson.duration : "Not set";
 
   return (
     <div className="space-y-6 p-6">
@@ -213,6 +219,11 @@ export default async function LessonIdPage({
                   courseId={courseId}
                   lessonId={lessonId}
                 />
+                <LessonDurationForm
+                  initialData={lesson}
+                  courseId={courseId}
+                  lessonId={lessonId}
+                />
               </div>
             </CardContent>
           </Card>
@@ -276,6 +287,7 @@ export default async function LessonIdPage({
                     completed: !!lesson.description,
                   },
                   { label: "Video Uploaded", completed: !!lesson.videoUrl },
+                  { label: "Lesson Duration", completed: !!lesson.duration },
                 ].map((field, index) => (
                   <div key={index} className="flex items-center gap-3">
                     {field.completed ? (

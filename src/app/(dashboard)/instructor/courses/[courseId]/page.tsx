@@ -22,6 +22,9 @@ import { CourseActions } from "./_components/course-actions";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LearningsForm } from "./_components/learnings-form";
+import { RequirementsForm } from "./_components/requirements-form";
+import { IncludesForm } from "./_components/includes-form";
 
 export default async function InstructorCourseIdPage({
   params,
@@ -75,6 +78,9 @@ export default async function InstructorCourseIdPage({
     course.description,
     course.imageUrl,
     course.price,
+    course.learnings,
+    course.includes,
+    course.requirements,
     course.categoryId,
     course.chapters.some((chapter) => chapter.isPublished),
   ];
@@ -223,6 +229,9 @@ export default async function InstructorCourseIdPage({
                   Chapter Management
                 </h2>
               </div>
+              <LearningsForm initialData={course} courseId={course.id} />
+              <RequirementsForm initialData={course} courseId={course.id} />
+              <IncludesForm initialData={course} courseId={course.id} />
               <ChaptersForm initialData={course} courseId={course.id} />
             </CardContent>
           </Card>

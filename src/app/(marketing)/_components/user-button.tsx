@@ -26,9 +26,14 @@ export function UserButton() {
 
   if (status === "unauthenticated") {
     return (
-      <Button asChild variant="outline" className="rounded-full">
-        <Link href="/login">Sign In</Link>
-      </Button>
+      <div className="flex items-center gap-2 ml-4">
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/login">Sign In</Link>
+        </Button>
+        <Button size="sm" asChild>
+          <Link href="/register">Sign Up</Link>
+        </Button>
+      </div>
     );
   }
 

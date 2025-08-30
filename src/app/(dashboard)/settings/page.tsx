@@ -1,47 +1,61 @@
 import { Settings } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
+import { NotificationSettingsForm } from "./_components/notification-settings-form";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { redirect } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"; // Added Card components for consistent styling
+import { Separator } from "@/components/ui/separator"; // Added Separator
 
 export default async function SettingsPage() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) return redirect("/");
+
+  const user = await db.user.findUnique({ where: { id: session.user.id } });
+
   return (
-    <div className="container mx-auto p-4 md:p-6">
-      <div className="flex items-center gap-x-3 mb-8">
-        <Settings className="h-8 w-8 text-primary" />
-        <h1 className="text-3xl font-bold">Settings</h1>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8">
+      <div className="container mx-auto px-4 md:px-6 space-y-8">
+        {/* Page Header */}
+        <div className="flex flex-col md:flex-row items-center justify-between pb-6 border-b border-gray-200">
+          <div className="flex items-center gap-x-4">
+            <Settings className="h-10 w-10 text-blue-600" />{" "}
+            {/* Larger, colored icon */}
+            <h1 className="text-4xl font-extrabold text-gray-900 leading-tight">
+              Settings
+            </h1>
+          </div>
+          <p className="text-lg text-gray-600 mt-2 md:mt-0">
+            Manage your application preferences.
+          </p>
+        </div>
 
-      <div className="grid gap-6 max-w-2xl">
-        <Card>
-          <CardHeader>
-            <CardTitle>Notifications</CardTitle>
+        {/* Settings Content Card */}
+        <Card className="border-0 shadow-xl rounded-lg overflow-hidden max-w-2xl mx-auto">
+          {" "}
+          {/* Max width and center */}
+          <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 text-2xl font-bold">
+              <Settings className="h-6 w-6" /> General Settings
+            </CardTitle>
+            <CardDescription className="text-blue-100 mt-1 text-base">
+              Configure your account and application behavior.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between space-x-2">
-              <Label htmlFor="marketing-emails">
-                Receive marketing emails and newsletters
-              </Label>
-              <Switch id="marketing-emails" defaultChecked />
-            </div>
-            <div className="flex items-center justify-between space-x-2">
-              <Label htmlFor="course-updates">
-                Get notified about updates to your enrolled courses
-              </Label>
-              <Switch id="course-updates" defaultChecked />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Account</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button variant="destructive">Delete Account</Button>
-            <p className="text-xs text-muted-foreground mt-2">
-              This action is irreversible and will delete all your data.
-            </p>
+          <CardContent className="p-6 bg-white">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              Notification Preferences
+            </h2>
+            <Separator className="mb-6" /> {/* Separator before the form */}
+            <NotificationSettingsForm
+              initialSettings={(user?.notifications as any) || {}}
+            />
           </CardContent>
         </Card>
       </div>

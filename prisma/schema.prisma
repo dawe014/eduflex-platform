@@ -30,11 +30,16 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
+
+  contactTickets ContactTicket[]
+  ticketMessages TicketMessage[]
+
   // Relationships
   courses     Course[]     @relation("CourseInstructor")
   enrollments Enrollment[]
   reviews     Review[]
   wishlist Wishlist[]
+  notifications    Json?
 
   // NextAuth specific models
   accounts Account[]
@@ -95,7 +100,11 @@ model Course {
   chapters     Chapter[]
   enrollments  Enrollment[]
   reviews      Review[]
-    wishlist Wishlist[]
+  wishlist Wishlist[]
+
+  learnings       String[]
+  requirements    String[] // An array of strings for course requirements
+  includes        String[] // An array of strings for "This course includes" points
 
 }
 
@@ -127,7 +136,7 @@ model Lesson {
   position    Int
   isPublished Boolean  @default(false)
   isFree      Boolean  @default(false)
-
+  duration    String?
 
   chapterId   String   @db.ObjectId
   chapter     Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
@@ -179,6 +188,9 @@ model Review {
   courseId  String   @db.ObjectId
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
+  isReported      Boolean @default(false) 
+  reportReason    String? 
+
   @@unique([userId, courseId])
 }
 
@@ -192,4 +204,35 @@ model Wishlist {
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId]) // A user can only wishlist a course once
+}
+
+
+enum TicketStatus {
+  OPEN
+  CLOSED
+}
+
+model ContactTicket {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  subject   String
+  status    TicketStatus @default(OPEN)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  userId    String       @db.ObjectId // The user who submitted the ticket
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  messages  TicketMessage[]
+}
+
+model TicketMessage {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  createdAt DateTime @default(now())
+
+  userId    String   @db.ObjectId // The user who wrote this specific message (can be user or admin)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  ticketId  String   @db.ObjectId
+  ticket    ContactTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 }

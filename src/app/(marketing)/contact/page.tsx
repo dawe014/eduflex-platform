@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useTransition } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,17 +15,54 @@ import {
   Send,
   ArrowRight,
 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { toast } from "sonner";
+import { createContactTicket } from "@/actions/contact-actions";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+
+const formSchema = z.object({
+  subject: z
+    .string()
+    .min(3, { message: "Subject must be at least 3 characters." }),
+  message: z
+    .string()
+    .min(10, { message: "Message must be at least 10 characters." }),
+});
 
 const ContactPage = () => {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Placeholder for form submission logic
-    alert("Thank you for your message! We'll get back to you within 24 hours.");
+  const { data: session, status } = useSession();
+  const [isPending, startTransition] = useTransition();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { subject: "", message: "" },
+  });
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    startTransition(async () => {
+      try {
+        const result = await createContactTicket(values);
+        toast.success(result.message);
+        form.reset();
+      } catch (error: any) {
+        toast.error(error.message || "Something went wrong.");
+      }
+    });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Hero Section */}
+      {/* ✅ Hero Section */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5"></div>
         <div className="container mx-auto px-4 relative">
@@ -44,7 +81,7 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* Contact Info Section */}
+      {/* ✅ Contact Info Section */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -111,7 +148,7 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* Contact Form & FAQ Section */}
+      {/* ✅ Contact Form & FAQ Section */}
       <section className="py-16 bg-slate-50">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-12">
@@ -122,77 +159,96 @@ const ContactPage = () => {
                   Send us a Message
                 </h2>
                 <p className="text-gray-600 mb-8">
-                  Fill out the form below and we'll get back to you as soon as
-                  possible.
+                  {session
+                    ? "Fill out the form to create a support ticket."
+                    : "Please log in to contact our support team."}
                 </p>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="text-gray-700">
-                        Full Name *
-                      </Label>
-                      <Input
-                        id="name"
-                        placeholder="John Doe"
-                        required
-                        className="py-3 px-4 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-gray-700">
-                        Email Address *
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="john@example.com"
-                        required
-                        className="py-3 px-4 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                      />
-                    </div>
-                  </div>
+                {status === "loading" && (
+                  <div className="text-center p-8">Loading session...</div>
+                )}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="subject" className="text-gray-700">
-                      Subject *
-                    </Label>
-                    <Input
-                      id="subject"
-                      placeholder="Course Feedback"
-                      required
-                      className="py-3 px-4 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="message" className="text-gray-700">
-                      Message *
-                    </Label>
-                    <Textarea
-                      id="message"
-                      placeholder="How can we help you?"
-                      required
-                      rows={5}
-                      className="py-3 px-4 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div className="pt-4">
-                    <Button
-                      type="submit"
-                      size="lg"
-                      className="w-full md:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 py-3 px-8 font-medium"
-                    >
-                      Send Message
-                      <Send className="ml-2 h-5 w-5" />
+                {status === "unauthenticated" && (
+                  <div className="text-center p-8 border-2 border-dashed rounded-lg">
+                    <h3 className="font-semibold text-lg">Login Required</h3>
+                    <p className="text-muted-foreground mt-2 mb-4">
+                      You need to be signed in to submit a ticket.
+                    </p>
+                    <Button asChild>
+                      <Link href="/login">Sign In</Link>
                     </Button>
                   </div>
-                </form>
+                )}
+
+                {status === "authenticated" && (
+                  <Form {...form}>
+                    <form
+                      onSubmit={form.handleSubmit(onSubmit)}
+                      className="space-y-6"
+                    >
+                      <div className="space-y-2">
+                        <Label htmlFor="subject" className="text-gray-700">
+                          Subject *
+                        </Label>
+                        <FormField
+                          control={form.control}
+                          name="subject"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  id="subject"
+                                  placeholder="e.g., Issue with a course video"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="message" className="text-gray-700">
+                          Message *
+                        </Label>
+                        <FormField
+                          control={form.control}
+                          name="message"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Textarea
+                                  {...field}
+                                  id="message"
+                                  placeholder="How can we help you?"
+                                  rows={5}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <div className="pt-4">
+                        <Button
+                          type="submit"
+                          size="lg"
+                          disabled={isPending}
+                          className="w-full md:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 py-3 px-8 font-medium"
+                        >
+                          {isPending ? "Submitting..." : "Submit Ticket"}
+                          <Send className="ml-2 h-5 w-5" />
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                )}
               </div>
             </div>
 
-            {/* FAQ & Additional Info */}
+            {/* ✅ FAQ */}
             <div className="lg:w-1/3">
               <div className="sticky top-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">
@@ -256,7 +312,7 @@ const ContactPage = () => {
         </div>
       </section>
 
-      {/* Map Section */}
+      {/* ✅ Map Section */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">

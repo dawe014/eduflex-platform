@@ -14,6 +14,7 @@ import {
   GraduationCap,
   CreditCard,
   Shield,
+  MessageSquare,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { SidebarItem } from "./sidebar-item";
@@ -39,11 +40,6 @@ export const SidebarRoutes = () => {
       label: "Wishlist",
       href: "/wishlist",
     },
-    {
-      icon: GraduationCap,
-      label: "My Certificates",
-      href: "/certificates",
-    },
   ];
 
   const instructorRoutes = [
@@ -51,11 +47,6 @@ export const SidebarRoutes = () => {
       icon: Video,
       label: "My Courses",
       href: "/instructor/courses",
-    },
-    {
-      icon: BarChart,
-      label: "Analytics",
-      href: "/instructor/analytics",
     },
     {
       icon: CreditCard,
@@ -84,6 +75,11 @@ export const SidebarRoutes = () => {
       icon: Video,
       label: "Courses",
       href: "/admin/courses",
+    },
+    {
+      icon: MessageSquare,
+      label: "Support",
+      href: "/admin/support",
     },
     {
       icon: Settings,
