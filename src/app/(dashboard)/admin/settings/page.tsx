@@ -113,54 +113,7 @@ export default async function AdminSettingsPage() {
         </Card>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Users</p>
-                <p className="text-2xl font-bold text-gray-900">1,248</p>
-              </div>
-              <div className="p-3 bg-blue-100 rounded-full">
-                <Users className="h-6 w-6 text-blue-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Total Courses
-                </p>
-                <p className="text-2xl font-bold text-gray-900">356</p>
-              </div>
-              <div className="p-3 bg-green-100 rounded-full">
-                <BookOpen className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  System Status
-                </p>
-                <p className="text-2xl font-bold text-gray-900">Online</p>
-              </div>
-              <div className="p-3 bg-green-100 rounded-full">
-                <div className="h-6 w-6 rounded-full bg-green-500"></div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+     
     </div>
   );
 }

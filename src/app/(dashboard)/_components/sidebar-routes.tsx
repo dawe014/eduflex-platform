@@ -1,4 +1,3 @@
-// File: src/app/(dashboard)/_components/sidebar-routes.tsx
 "use client";
 
 import {
@@ -11,17 +10,14 @@ import {
   Users,
   Video,
   Home,
-  GraduationCap,
   CreditCard,
   Shield,
   MessageSquare,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
 import { SidebarItem } from "./sidebar-item";
 import { useSession, signOut } from "next-auth/react";
 
 export const SidebarRoutes = () => {
-  const pathname = usePathname();
   const { data: session } = useSession();
 
   const studentRoutes = [
@@ -40,6 +36,16 @@ export const SidebarRoutes = () => {
       label: "Wishlist",
       href: "/wishlist",
     },
+    {
+      icon: User,
+      label: "Profile",
+      href: "/profile",
+    },
+    {
+      icon: Settings,
+      label: "Settings",
+      href: "/settings",
+    },
   ];
 
   const instructorRoutes = [
@@ -47,6 +53,11 @@ export const SidebarRoutes = () => {
       icon: Video,
       label: "My Courses",
       href: "/instructor/courses",
+    },
+    {
+      icon: BarChart,
+      label: "Analytics",
+      href: "/instructor/analytics",
     },
     {
       icon: CreditCard,
@@ -57,6 +68,16 @@ export const SidebarRoutes = () => {
       icon: Users,
       label: "Students",
       href: "/instructor/students",
+    },
+    {
+      icon: User,
+      label: "Profile",
+      href: "/profile",
+    },
+    {
+      icon: Settings,
+      label: "Settings",
+      href: "/settings",
     },
   ];
 
@@ -78,48 +99,37 @@ export const SidebarRoutes = () => {
     },
     {
       icon: MessageSquare,
-      label: "Support",
-      href: "/admin/support",
-    },
-    {
-      icon: Settings,
-      label: "Settings",
-      href: "/admin/settings",
+      label: "Messages",
+      href: "/admin/messages",
     },
     {
       icon: Shield,
       label: "Moderation",
       href: "/admin/moderation",
     },
-  ];
-
-  const commonRoutes = [
+    {
+      icon: Settings,
+      label: "Platform Settings",
+      href: "/admin/settings",
+    },
     {
       icon: User,
       label: "Profile",
       href: "/profile",
     },
-    {
-      icon: Settings,
-      label: "Settings",
-      href: "/settings",
-    },
   ];
 
-  let routes = [...commonRoutes];
+  let routes = studentRoutes; // Default to student
 
   if (session?.user?.role === "INSTRUCTOR") {
-    routes = [...instructorRoutes, ...commonRoutes];
+    routes = instructorRoutes;
   } else if (session?.user?.role === "ADMIN") {
-    routes = [...adminRoutes, ...commonRoutes];
-  } else {
-    routes = [...studentRoutes, ...commonRoutes];
+    routes = adminRoutes;
   }
 
   return (
     <div className="flex flex-col h-full">
-      {/* Main navigation links */}
-      <div className="flex flex-col w-full flex-1 space-y-1">
+      <div className="flex flex-col w-full flex-1 space-y-1 p-2">
         {routes.map((route) => (
           <SidebarItem
             key={route.href}
@@ -130,14 +140,13 @@ export const SidebarRoutes = () => {
         ))}
       </div>
 
-      {/* Logout button at the bottom */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 mt-auto">
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
           type="button"
-          className="flex items-center gap-x-3 text-gray-600 text-sm font-medium p-4 transition-all hover:bg-red-50 hover:text-red-700 rounded-lg mx-2 w-full"
+          className="flex items-center gap-x-3 text-gray-600 text-sm font-medium p-3 transition-all hover:bg-red-50 hover:text-red-700 rounded-lg w-full"
         >
-          <LogOut size={20} className="text-gray-500" />
+          <LogOut size={20} />
           <span>Logout</span>
         </button>
       </div>

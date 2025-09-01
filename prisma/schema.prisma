@@ -30,9 +30,8 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
+  contactMessages ContactMessage[]
 
-  contactTickets ContactTicket[]
-  ticketMessages TicketMessage[]
 
   // Relationships
   courses     Course[]     @relation("CourseInstructor")
@@ -206,33 +205,22 @@ model Wishlist {
   @@unique([userId, courseId]) // A user can only wishlist a course once
 }
 
-
-enum TicketStatus {
-  OPEN
-  CLOSED
+enum MessageStatus {
+  UNREAD
+  READ
+  ARCHIVED
 }
 
-model ContactTicket {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+model ContactMessage {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  name      String        // Guest's name
+  email     String        // Guest's email
   subject   String
-  status    TicketStatus @default(OPEN)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  message   String
+  status    MessageStatus @default(UNREAD)
+  createdAt DateTime      @default(now())
 
-  userId    String       @db.ObjectId // The user who submitted the ticket
-  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  messages  TicketMessage[]
-}
-
-model TicketMessage {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  content   String
-  createdAt DateTime @default(now())
-
-  userId    String   @db.ObjectId // The user who wrote this specific message (can be user or admin)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  ticketId  String   @db.ObjectId
-  ticket    ContactTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  // This is an OPTIONAL link to a registered user account
+  userId    String?       @db.ObjectId
+  user      User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
 }

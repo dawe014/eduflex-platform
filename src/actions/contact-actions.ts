@@ -1,92 +1,98 @@
+// File: src/actions/contact-actions.ts
 "use server";
 
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { MessageStatus } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import * as z from "zod";
 
+// Schema for validating the form data
 const contactSchema = z.object({
-  subject: z
-    .string()
-    .min(3, { message: "Subject must be at least 3 characters." }),
-  message: z
-    .string()
-    .min(10, { message: "Message must be at least 10 characters." }),
+  name: z.string().min(2, "Name is required"),
+  email: z.string().email("A valid email is required"),
+  subject: z.string().min(3, "Subject is required"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
-export async function createContactTicket(formData: {
-  subject: string;
-  message: string;
-}) {
+/**
+ * Action for any visitor (guest or user) to submit a contact message.
+ * The message is saved to the database for admin review.
+ */
+export async function submitContactMessage(
+  formData: z.infer<typeof contactSchema>
+) {
+  // 1. Validate the data on the server
+  const validation = contactSchema.safeParse(formData);
+  if (!validation.success) {
+    throw new Error(validation.error.errors[0].message);
+  }
+
+  const { name, email, subject, message } = validation.data;
+
+  // 2. Check if a user is logged in
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id; // Will be null if user is a guest
+
+  // 3. Save the message to the database
   try {
-    // --- ADD THIS TRY BLOCK ---
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      throw new Error("You must be logged in to send a message.");
-    }
-
-    const validation = contactSchema.safeParse(formData);
-    if (!validation.success) {
-      // Throw the first validation error message
-      throw new Error(validation.error.errors[0].message);
-    }
-    const { subject, message } = validation.data;
-
-    await db.contactTicket.create({
+    await db.contactMessage.create({
       data: {
+        name,
+        email,
         subject,
-        userId: session.user.id,
-        messages: {
-          create: [
-            {
-              content: message,
-              userId: session.user.id,
-            },
-          ],
-        },
+        message,
+        // Link to the user account if they are logged in
+        userId: userId,
       },
     });
 
-    revalidatePath("/contact");
+    revalidatePath("/admin/messages"); // Let the admin dashboard know new data is available
     return {
       success: true,
-      message: "Your message has been sent successfully! We will reply soon.",
+      message: "Your message has been sent successfully!",
     };
-  } catch (error: any) {
-    // --- ADD THIS CATCH BLOCK ---
-    console.error("CREATE_CONTACT_TICKET_ERROR:", error);
-    // This makes sure a specific error message is always sent back to the client
-    throw new Error(
-      error.message || "An unexpected error occurred on the server."
-    );
+  } catch (error) {
+    console.error("CONTACT_MESSAGE_ERROR:", error);
+    throw new Error("Failed to send message. Please try again later.");
   }
 }
 
-// Action for an admin to reply to a ticket
-export async function replyToTicket(ticketId: string, content: string) {
+/**
+ * Action for an ADMIN to update the status of a message.
+ */
+export async function updateMessageStatus(
+  messageId: string,
+  status: MessageStatus
+) {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "ADMIN") {
     throw new Error("Forbidden: Admins only.");
   }
-  if (!content.trim()) {
-    throw new Error("Reply content cannot be empty.");
+
+  await db.contactMessage.update({
+    where: { id: messageId },
+    data: { status },
+  });
+
+  revalidatePath("/admin/messages");
+  return { success: true, message: `Message status updated to ${status}.` };
+}
+
+/**
+ * Action for an ADMIN to delete a contact message.
+ */
+export async function deleteContactMessage(messageId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user || session.user.role !== "ADMIN") {
+    throw new Error("Forbidden: Admins only.");
   }
 
-  await db.ticketMessage.create({
-    data: {
-      ticketId,
-      content,
-      userId: session.user.id,
-    },
+  await db.contactMessage.delete({
+    where: { id: messageId },
   });
 
-  // Optionally, re-open the ticket if it was closed
-  await db.contactTicket.update({
-    where: { id: ticketId },
-    data: { status: "OPEN" },
-  });
-
-  revalidatePath(`/admin/support/${ticketId}`);
-  return { success: true, message: "Reply sent successfully." };
+  revalidatePath("/admin/messages");
+  return { success: true, message: "Message deleted successfully." };
 }
