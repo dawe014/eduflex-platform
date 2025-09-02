@@ -26,7 +26,7 @@ export async function submitContactMessage(
   // 1. Validate the data on the server
   const validation = contactSchema.safeParse(formData);
   if (!validation.success) {
-    throw new Error(validation.error.errors[0].message);
+    throw new Error(validation.error.issues[0].message);
   }
 
   const { name, email, subject, message } = validation.data;
