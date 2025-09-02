@@ -99,8 +99,8 @@ This project demonstrates expertise in:
 1. **Clone the repository:**
 
    ```sh
-   git clone https://github.com/[YOUR_USERNAME]/[YOUR_REPO_NAME].git
-   cd [YOUR_REPO_NAME]
+   git clone https://github.com/dawe014/eduflex-platform.git
+   cd eduflex-platform
    ```
 
 2. **Install dependencies:**
@@ -172,5 +172,5 @@ npm run test:ui
 
 ## 📞 Contact
 
-**\[Your Name]** – \[[your.email@example.com](mailto:your.email@example.com)]
-**Project Link:** [https://github.com/\[YOUR_USERNAME\]/\[YOUR_REPO_NAME\]](https://github.com/[YOUR_USERNAME]/[YOUR_REPO_NAME])
+**Dawit Tamiru** – \[dawittamiru014@gmail.com(mailto:dawittamiru014@gmail.com)]
+**Project Link:** [https://github.com/dawe014/eduflex-platform](https://github.com/dawe014/eduflex-platform)
