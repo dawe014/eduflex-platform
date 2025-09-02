@@ -126,8 +126,6 @@ export const Reviews = ({ reviews }: ReviewsProps) => {
                       </span>
                     </div>
                   </div>
-                  {/* Conditionally render the report button only if a user is logged in */}
-                  {session && <ReportReviewModal reviewId={review.id} />}
                 </div>
                 <p className="text-gray-700 mt-3">{review.comment}</p>
               </div>
