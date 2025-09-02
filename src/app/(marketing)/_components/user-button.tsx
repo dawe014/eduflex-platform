@@ -1,7 +1,6 @@
-// File: src/app/(marketing)/_components/user-button.tsx
 "use client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,10 +12,33 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import { Settings, LogOut, User, BookOpen, Video, Crown } from "lucide-react";
+import {
+  Settings,
+  LogOut,
+  User,
+  BookOpen,
+  Video,
+  Crown,
+  BarChart,
+} from "lucide-react"; // Added BarChart for Admin
+import { UserRole } from "@prisma/client";
 
 export function UserButton() {
   const { data: session, status } = useSession();
+
+  // A helper function to determine the correct dashboard path based on the user's role
+  const getDashboardPath = (role: UserRole | undefined) => {
+    switch (role) {
+      case "ADMIN":
+        return "/admin/overview";
+      case "INSTRUCTOR":
+        return "/instructor/courses";
+      case "STUDENT":
+        return "/dashboard";
+      default:
+        return "/dashboard"; // Fallback for any unexpected cases
+    }
+  };
 
   if (status === "loading") {
     return (
@@ -30,54 +52,58 @@ export function UserButton() {
         <Button variant="ghost" size="sm" asChild>
           <Link href="/login">Sign In</Link>
         </Button>
-        <Button size="sm" asChild>
+        <Button size="sm" asChild className="bg-blue-600 hover:bg-blue-700">
           <Link href="/register">Sign Up</Link>
         </Button>
       </div>
     );
   }
 
+  const dashboardPath = getDashboardPath(session?.user?.role);
+  const userRole = session?.user?.role;
+
+  // Choose the icon based on the role for the dashboard link
+  const DashboardIcon =
+    userRole === "ADMIN"
+      ? BarChart
+      : userRole === "INSTRUCTOR"
+      ? Video
+      : BookOpen;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="outline-none">
-        <Avatar className="h-10 w-10 border-2 border-blue-100 cursor-pointer hover:border-blue-200 transition-colors">
+        <Avatar className="h-10 w-10 border-2 border-transparent hover:border-blue-300 transition-colors">
           <AvatarImage src={session?.user?.image || ""} />
-          <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800">
+          <AvatarFallback className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 font-semibold">
             {session?.user?.name?.charAt(0).toUpperCase() || "U"}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="flex flex-col">
-          <span className="font-semibold">{session?.user?.name}</span>
-          <span className="text-xs text-gray-500 font-normal capitalize">
+          <span className="font-semibold truncate">{session?.user?.name}</span>
+          <span className="text-xs text-gray-500 font-normal capitalize flex items-center gap-1 mt-1">
+            {userRole === "ADMIN" && (
+              <Crown className="h-3 w-3 text-amber-500" />
+            )}
             {session?.user?.role?.toLowerCase() || "student"}
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
+        {/* --- CORRECTED DASHBOARD LINK --- */}
         <DropdownMenuItem asChild>
-          <Link href="/profile" className="cursor-pointer">
-            <User className="h-4 w-4 mr-2" />
-            Profile
+          <Link href={dashboardPath} className="cursor-pointer">
+            <DashboardIcon className="h-4 w-4 mr-2" />
+            Dashboard
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link
-            href={
-              session?.user?.role === "INSTRUCTOR"
-                ? "/instructor/courses"
-                : "/dashboard"
-            }
-            className="cursor-pointer"
-          >
-            {session?.user?.role === "INSTRUCTOR" ? (
-              <Video className="h-4 w-4 mr-2" />
-            ) : (
-              <BookOpen className="h-4 w-4 mr-2" />
-            )}
-            Dashboard
+          <Link href="/profile" className="cursor-pointer">
+            <User className="h-4 w-4 mr-2" />
+            Profile
           </Link>
         </DropdownMenuItem>
 
