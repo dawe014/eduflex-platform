@@ -172,5 +172,5 @@ npm run test:ui
 
 ## 📞 Contact
 
-**Dawit Tamiru** – \[dawittamiru014@gmail.com(mailto:dawittamiru014@gmail.com)]
+**Dawit Tamiru** – [dawittamiru014@gmail.com](mailto:dawittamiru014@gmail.com)  
 **Project Link:** [https://github.com/dawe014/eduflex-platform](https://github.com/dawe014/eduflex-platform)
