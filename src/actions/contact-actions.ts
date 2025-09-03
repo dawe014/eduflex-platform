@@ -1,4 +1,3 @@
-// File: src/actions/contact-actions.ts
 "use server";
 
 import { authOptions } from "@/lib/auth";
@@ -43,7 +42,6 @@ export async function submitContactMessage(
         email,
         subject,
         message,
-        // Link to the user account if they are logged in
         userId: userId,
       },
     });

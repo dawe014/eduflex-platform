@@ -30,7 +30,7 @@ import { Review } from "@prisma/client";
 
 interface ReviewModalProps {
   courseId: string;
-  existingReview: Review | null; // Pass the user's existing review, if any
+  existingReview: Review | null;
 }
 
 const formSchema = z.object({
@@ -42,7 +42,6 @@ export const ReviewModal = ({ courseId, existingReview }: ReviewModalProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // The star rating needs its own local state for the hover effect
   const [rating, setRating] = useState(existingReview?.rating || 0);
   const [hover, setHover] = useState(0);
 
@@ -103,7 +102,7 @@ export const ReviewModal = ({ courseId, existingReview }: ReviewModalProps) => {
                             )}
                             onClick={() => {
                               setRating(starValue);
-                              field.onChange(starValue); // Update react-hook-form's state
+                              field.onChange(starValue);
                             }}
                             onMouseEnter={() => setHover(starValue)}
                             onMouseLeave={() => setHover(0)}

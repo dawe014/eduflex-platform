@@ -1,4 +1,3 @@
-// File: src/app/(marketing)/_components/logo.tsx
 import Link from "next/link";
 
 export const Logo = () => {

@@ -12,21 +12,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import {
-  Settings,
-  LogOut,
-  User,
-  BookOpen,
-  Video,
-  Crown,
-  BarChart,
-} from "lucide-react"; // Added BarChart for Admin
+import { LogOut, User, BookOpen, Video, Crown, BarChart } from "lucide-react";
 import { UserRole } from "@prisma/client";
 
 export function UserButton() {
   const { data: session, status } = useSession();
 
-  // A helper function to determine the correct dashboard path based on the user's role
   const getDashboardPath = (role: UserRole | undefined) => {
     switch (role) {
       case "ADMIN":
@@ -36,7 +27,7 @@ export function UserButton() {
       case "STUDENT":
         return "/dashboard";
       default:
-        return "/dashboard"; // Fallback for any unexpected cases
+        return "/"; // Fallback for any unexpected cases
     }
   };
 
@@ -92,7 +83,6 @@ export function UserButton() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        {/* --- CORRECTED DASHBOARD LINK --- */}
         <DropdownMenuItem asChild>
           <Link href={dashboardPath} className="cursor-pointer">
             <DashboardIcon className="h-4 w-4 mr-2" />
@@ -104,13 +94,6 @@ export function UserButton() {
           <Link href="/profile" className="cursor-pointer">
             <User className="h-4 w-4 mr-2" />
             Profile
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem asChild>
-          <Link href="/settings" className="cursor-pointer">
-            <Settings className="h-4 w-4 mr-2" />
-            Settings
           </Link>
         </DropdownMenuItem>
 

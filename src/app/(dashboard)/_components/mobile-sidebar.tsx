@@ -1,4 +1,3 @@
-// File: src/app/(dashboard)/_components/mobile-sidebar.tsx
 "use client";
 
 import { useMobileSidebar } from "@/hooks/use-mobile-sidebar";

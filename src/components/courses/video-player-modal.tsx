@@ -43,14 +43,6 @@ export const VideoPlayerModal = ({
             <DialogTitle className="text-white text-lg font-semibold truncate max-w-md">
               {title}
             </DialogTitle>
-            {/* <Button
-              onClick={onClose}
-              variant="ghost"
-              size="icon"
-              className="rounded-full h-8 w-8 text-white hover:bg-white/20"
-            >
-              <X className="h-5 w-5" />
-            </Button> */}
           </DialogHeader>
 
           {/* Video Player */}

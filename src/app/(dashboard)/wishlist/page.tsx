@@ -16,7 +16,6 @@ import {
   Lesson,
 } from "@prisma/client";
 
-// Define the comprehensive type that CourseCard now expects
 type CourseWithFullDetails = Course & {
   category: Category | null;
   reviews: Review[];
@@ -28,7 +27,6 @@ export default async function WishlistPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) return redirect("/");
 
-  // --- 1. UPDATED QUERY: Fetch Wishlist with Chapters and Lessons ---
   const wishlistItems = await db.wishlist.findMany({
     where: { userId: session.user.id },
     include: {
@@ -37,7 +35,6 @@ export default async function WishlistPage() {
           category: true,
           reviews: true,
           enrollments: true,
-          // --- THIS IS THE CRUCIAL ADDITION ---
           chapters: {
             where: { isPublished: true },
             include: {
@@ -54,7 +51,6 @@ export default async function WishlistPage() {
 
   const totalWishlisted = wishlistItems.length;
   console.log(wishlistItems);
-  // --- 2. Calculate Stats Based on Wishlist (No changes needed here) ---
   const totalPrice = wishlistItems.reduce(
     (sum, item) => sum + (item.course.price || 0),
     0
@@ -71,7 +67,6 @@ export default async function WishlistPage() {
   const averageRating =
     totalRatingsCount > 0 ? totalRatingsSum / totalRatingsCount : 0;
 
-  // --- 3. UPDATED QUERY: Fetch Recommendations with Chapters and Lessons ---
   let recommendedCourses: CourseWithFullDetails[] = [];
   if (totalWishlisted > 0) {
     const categoryIds = wishlistItems
@@ -97,7 +92,6 @@ export default async function WishlistPage() {
           category: true,
           reviews: true,
           enrollments: true,
-          // --- ADD THIS TO THE RECOMMENDATIONS QUERY AS WELL ---
           chapters: {
             where: { isPublished: true },
             include: {

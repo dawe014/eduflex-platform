@@ -9,18 +9,17 @@ export async function PATCH(req: Request) {
     if (!session?.user)
       return new NextResponse("Unauthorized", { status: 401 });
 
-    const values = await req.json(); // e.g., { marketingEmails: true, courseUpdates: false }
+    const values = await req.json();
 
     await db.user.update({
       where: { id: session.user.id },
       data: {
-        notifications: values, // Store the entire settings object
+        notifications: values,
       },
     });
 
     return new NextResponse("Notification settings updated", { status: 200 });
   } catch (error) {
-    console.log("[NOTIFICATIONS_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

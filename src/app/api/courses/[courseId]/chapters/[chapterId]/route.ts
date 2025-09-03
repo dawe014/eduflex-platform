@@ -3,7 +3,6 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-// Generic PATCH for updating chapter details
 export async function PATCH(
   req: Request,
   { params }: { params: { courseId: string; chapterId: string } }
@@ -30,7 +29,6 @@ export async function PATCH(
 
     return NextResponse.json(chapter);
   } catch (error) {
-    console.log("[COURSE_CHAPTER_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

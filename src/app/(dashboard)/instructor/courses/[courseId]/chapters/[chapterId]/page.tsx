@@ -34,7 +34,6 @@ export default async function ChapterIdPage({
     return redirect("/");
   }
 
-  // CORRECT: Destructure params directly
   const { courseId, chapterId } = await params;
 
   const chapter = await db.chapter.findUnique({
@@ -50,7 +49,6 @@ export default async function ChapterIdPage({
         orderBy: {
           position: "asc",
         },
-        // REMOVED: `include: { videoUrl: true }` as it's invalid. videoUrl is fetched automatically.
       },
       course: {
         select: {
@@ -70,16 +68,11 @@ export default async function ChapterIdPage({
   const completedFields = requiredFields.filter(Boolean).length;
   const completionPercentage = (completedFields / totalFields) * 100;
 
-  // Calculate chapter statistics
   const totalLessons = chapter.lessons.length;
   const publishedLessons = chapter.lessons.filter(
     (lesson) => lesson.isPublished
   ).length;
 
-  // Placeholder for duration as it's a complex calculation
-  const formattedDuration = `${totalLessons * 5}m`; // Assuming 5 mins per lesson as a placeholder
-
-  // The isComplete check for publishing a chapter should also include lessons
   const isReadyForPublish =
     requiredFields.every(Boolean) && publishedLessons > 0;
 
@@ -151,22 +144,6 @@ export default async function ChapterIdPage({
             <p className="text-sm text-gray-600">
               {publishedLessons} published
             </p>
-          </CardContent>
-        </Card>
-
-        {/* Duration Card */}
-        <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900">Duration</h3>
-              <div className="p-2 bg-amber-100 rounded-full">
-                <Clock className="h-4 w-4 text-amber-600" />
-              </div>
-            </div>
-            <p className="text-2xl font-bold text-gray-900">
-              ~{formattedDuration}
-            </p>
-            <p className="text-sm text-gray-600">Estimated total</p>
           </CardContent>
         </Card>
 

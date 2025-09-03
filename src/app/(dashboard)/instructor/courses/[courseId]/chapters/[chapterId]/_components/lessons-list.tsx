@@ -1,4 +1,3 @@
-// File: .../_components/lessons-list.tsx
 "use client";
 
 import { Lesson } from "@prisma/client";

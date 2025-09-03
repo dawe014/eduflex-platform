@@ -1,4 +1,3 @@
-// File: src/app/api/courses/[courseId]/reviews/route.ts
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
@@ -48,7 +47,6 @@ export async function POST(
 
     return NextResponse.json(review);
   } catch (error) {
-    console.log("[REVIEWS]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

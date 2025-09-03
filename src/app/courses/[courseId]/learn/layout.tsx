@@ -23,7 +23,6 @@ const CourseLearnLayout = async ({
   });
   if (!enrollment) return redirect(`/courses/${courseId}`);
 
-  // CORRECTED & SIMPLIFIED PRISMA QUERY
   const course = await db.course.findUnique({
     where: { id: courseId },
     include: {

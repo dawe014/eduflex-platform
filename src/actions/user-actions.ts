@@ -6,7 +6,6 @@ import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcrypt";
 
-// This function remains the same
 export async function updateUserRole(userId: string, role: UserRole) {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "ADMIN") {
@@ -25,7 +24,6 @@ export async function updateUserRole(userId: string, role: UserRole) {
   return { success: true };
 }
 
-// --- ADD THIS NEW FUNCTION ---
 export async function deleteUser(userId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "ADMIN") {
@@ -35,8 +33,6 @@ export async function deleteUser(userId: string) {
     throw new Error("Admins cannot delete their own account.");
   }
 
-  // Advanced: You might want to handle what happens to an instructor's courses.
-  // For now, Prisma's cascade delete will handle related data like enrollments, reviews, etc.
   const deletedUser = await db.user.delete({
     where: { id: userId },
   });
@@ -71,9 +67,6 @@ export async function addUserByAdmin(userData: {
     throw new Error("A user with this email already exists.");
   }
 
-  // Create a secure, random temporary password
-  // In a real-world scenario, you would typically send an email invitation
-  // with a link to set a password. For this app, a long random string is sufficient.
   const temporaryPassword = Math.random().toString(36).slice(-12);
   const hashedPassword = await bcrypt.hash(temporaryPassword, 12);
 
@@ -83,18 +76,35 @@ export async function addUserByAdmin(userData: {
       email,
       role,
       hashedPassword,
-      // We can mark the email as verified since the admin is creating it
       emailVerified: new Date(),
     },
   });
 
   revalidatePath("/admin/users");
 
-  // IMPORTANT: In a real app, you MUST inform the user of their temporary password.
-  // Since we don't have an email system, we'll return it to the admin's UI.
   return {
     success: true,
     message: `User ${newUser.name} created successfully.`,
-    temporaryPassword: temporaryPassword, // Return this for the admin to copy
+    temporaryPassword: temporaryPassword,
   };
+}
+
+export async function completeUserProfile(role: UserRole) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized: You must be logged in.");
+  }
+
+  // Ensure the role is a valid enum value
+  if (role !== "STUDENT" && role !== "INSTRUCTOR") {
+    throw new Error("Invalid role selected.");
+  }
+
+  await db.user.update({
+    where: { id: session.user.id },
+    data: { role },
+  });
+
+  revalidatePath("/profile");
+  return { success: true, message: "Profile updated successfully!" };
 }

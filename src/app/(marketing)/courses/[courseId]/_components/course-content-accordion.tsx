@@ -8,13 +8,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Lock, PlayCircle, Clock } from "lucide-react"; // Import Clock icon
+import { Lock, PlayCircle, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VideoPlayerModal } from "@/components/courses/video-player-modal";
 
 type ChapterWithLessons = Chapter & {
   lessons: Lesson[];
-  // --- NEW: Add pre-calculated duration ---
   totalDuration: string;
 };
 
@@ -59,7 +58,6 @@ export const CourseContentAccordion = ({
                   </div>
                   <span className="text-left">{chapter.title}</span>
                 </div>
-                {/* --- NEW: Display Chapter Duration --- */}
                 <div className="flex items-center gap-x-2 text-sm text-gray-500 font-normal pr-2">
                   <span>{chapter.lessons.length} lessons</span>
                   <span className="text-xs">•</span>
@@ -72,7 +70,6 @@ export const CourseContentAccordion = ({
             </AccordionTrigger>
             <AccordionContent className="border-t border-gray-200/80">
               <div className="space-y-1 py-2">
-                {/* ... (Lesson mapping logic remains the same) ... */}
                 {chapter.lessons.map((lesson) => {
                   const isPreviewable = lesson.isFree && lesson.videoUrl;
                   const Icon = isPreviewable ? PlayCircle : Lock;

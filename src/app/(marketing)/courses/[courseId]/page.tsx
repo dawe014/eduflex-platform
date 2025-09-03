@@ -1,7 +1,5 @@
 import { db } from "@/lib/db";
-import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
 import { Reviews } from "@/components/courses/reviews";
 import {
   Card,
@@ -10,17 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Star,
-  Users,
-  BookOpen,
-  Award,
-  CheckCircle,
-  Play,
-  Calendar,
-  ListChecks,
-  Clock,
-} from "lucide-react";
+import { Users, BookOpen, CheckCircle, ListChecks, Clock } from "lucide-react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { EnrollmentStatus } from "@/components/courses/enrollment-status";
@@ -31,7 +19,7 @@ import { CourseHero } from "./_components/course-hero";
 import {
   calculateTotalCourseDuration,
   calculateChapterDuration,
-} from "@/lib/duration-helper"; // THE KEY IMPORT
+} from "@/lib/duration-helper";
 
 interface CourseIdPageProps {
   params: { courseId: string };
@@ -75,9 +63,6 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
     return notFound();
   }
 
-  // --- NEW: Fetch the instructor's total student count separately ---
-  // This is the key to solving the bug. We find all courses by this instructor
-  // and then include a count of their enrollments.
   const instructorStats = await db.user.findUnique({
     where: { id: course.instructorId },
     include: {
@@ -91,7 +76,6 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
     },
   });
 
-  // Now, we sum up the enrollments from all of their courses
   const totalInstructorStudents =
     instructorStats?.courses.reduce((sum, currentCourse) => {
       return sum + currentCourse._count.enrollments;
@@ -100,7 +84,7 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
   // --- Dynamic Data Calculations ---
   const allLessons = course.chapters.flatMap((chapter) => chapter.lessons);
   const totalLessons = allLessons.length;
-  const totalDuration = calculateTotalCourseDuration(course.chapters); // DYNAMIC DURATION
+  const totalDuration = calculateTotalCourseDuration(course.chapters);
 
   const chaptersWithDurations = course.chapters.map((chapter) => ({
     ...chapter,
@@ -229,14 +213,13 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
                     <div className="flex flex-wrap items-center gap-6 text-sm">
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-gray-500" />
-                        {/* USE THE NEWLY CALCULATED VALUE */}
                         <span>
                           {totalInstructorStudents.toLocaleString()} Students
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4 text-gray-500" />
-                        {/* The original course count was correct */}
+
                         <span>{course.instructor?._count.courses} Courses</span>
                       </div>
                     </div>

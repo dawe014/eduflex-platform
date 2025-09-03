@@ -1,4 +1,3 @@
-// File: src/app/api/courses/[courseId]/route.ts
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
@@ -40,7 +39,6 @@ export async function PATCH(
 
     return NextResponse.json(course);
   } catch (error) {
-    console.log("[COURSE_ID]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -61,7 +59,6 @@ export async function DELETE(
 
     return NextResponse.json(deletedCourse);
   } catch (error) {
-    console.log("[COURSE_DELETE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

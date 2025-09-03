@@ -207,7 +207,6 @@ export default async function StudentDashboard() {
         )}
       </div>
 
-      {/* Continue Learning Section - Show the first course with progress < 100% */}
       {coursesWithProgress.some((course) => course.progress < 100) && (
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-6">

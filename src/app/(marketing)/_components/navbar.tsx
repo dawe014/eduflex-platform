@@ -1,4 +1,3 @@
-// File: src/app/(marketing)/_components/navbar.tsx
 "use client";
 
 import { Logo } from "./logo";
@@ -21,7 +20,6 @@ export const Navbar = () => {
       )}
     >
       <div className="container mx-auto px-4 md:px-6 w-full flex items-center justify-between h-full">
-        {/* Logo - Always visible */}
         <div className="flex items-center">
           <Logo />
         </div>

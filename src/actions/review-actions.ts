@@ -44,19 +44,16 @@ export async function submitReview(
   }
 
   // 3. Create or Update the review using `upsert`
-  // `upsert` is perfect here: it will create a new review if one doesn't exist,
-  // or update the existing one if the user wants to change their rating/comment.
+
   await db.review.upsert({
     where: {
       userId_courseId: { userId: session.user.id, courseId },
     },
     update: {
-      // What to do if a review already exists
       rating,
       comment,
     },
     create: {
-      // What to do if no review exists
       courseId,
       userId: session.user.id,
       rating,
@@ -64,7 +61,6 @@ export async function submitReview(
     },
   });
 
-  // Revalidate the course page path to show the new review instantly
   revalidatePath(`/courses/${courseId}`);
 
   return { success: true, message: "Thank you for your review!" };

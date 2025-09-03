@@ -67,7 +67,6 @@ export default async function EarningsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user) return redirect("/");
 
-  // Fetch all courses with their enrollments for this instructor
   const courses = await db.course.findMany({
     where: { instructorId: session.user.id },
     include: {
@@ -77,12 +76,10 @@ export default async function EarningsPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  // Aggregate all enrollments from all courses
   const allEnrollments = courses.flatMap((course) =>
     course.enrollments.map((e) => ({ ...e, course: { price: course.price } }))
   );
 
-  // --- Dynamic Data Calculations ---
   const totalRevenue = allEnrollments.reduce(
     (acc, e) => acc + (e.course.price || 0),
     0
@@ -90,7 +87,6 @@ export default async function EarningsPage() {
   const totalStudents = allEnrollments.length;
   const totalCourses = courses.length;
 
-  // Calculate this month's revenue
   const thisMonth = new Date().getMonth();
   const thisYear = new Date().getFullYear();
   const monthlyRevenue = allEnrollments

@@ -1,10 +1,8 @@
-"use client"; // This component now uses a client component (modal), so it must be a client component itself.
-
+"use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ReportReviewModal } from "./report-review-modal"; // Import the new modal
-import { useSession } from "next-auth/react"; // Import useSession to conditionally show the report button
+import { useSession } from "next-auth/react";
 
 // Define a more complete type for reviews with user info
 type ReviewWithUser = {
@@ -23,7 +21,7 @@ interface ReviewsProps {
 }
 
 export const Reviews = ({ reviews }: ReviewsProps) => {
-  const { data: session } = useSession(); // Get the current user's session
+  const { data: session } = useSession();
 
   const totalReviews = reviews.length;
   const avgRating =
@@ -48,7 +46,7 @@ export const Reviews = ({ reviews }: ReviewsProps) => {
                   <Star
                     key={i}
                     className={`h-5 w-5 ${
-                      i < Math.round(avgRating) // Use Math.round for a more intuitive fill
+                      i < Math.round(avgRating)
                         ? "text-amber-400 fill-amber-400"
                         : "text-gray-300"
                     }`}

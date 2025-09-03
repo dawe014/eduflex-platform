@@ -1,4 +1,3 @@
-// File: .../_components/lessons-form.tsx
 "use client";
 
 import * as z from "zod";

@@ -1,4 +1,3 @@
-// File: src/actions/progress-actions.ts
 "use server";
 
 import { authOptions } from "@/lib/auth";
@@ -19,5 +18,5 @@ export async function toggleLessonComplete(lessonId: string, pathname: string) {
     create: { userId: session.user.id, lessonId, isCompleted: true },
   });
 
-  revalidatePath(pathname); // Re-fetch data on the page
+  revalidatePath(pathname);
 }

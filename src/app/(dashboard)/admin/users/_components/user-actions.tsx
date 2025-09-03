@@ -125,7 +125,7 @@ export const UserActions = ({
             <AlertDialogAction
               onClick={onDelete}
               disabled={isPending}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-white"
             >
               {isPending ? "Deleting..." : "Yes, delete user"}
             </AlertDialogAction>

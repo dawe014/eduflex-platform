@@ -28,6 +28,7 @@ import { UserFilters } from "./_components/user-filters";
 import { Pagination } from "@/components/pagination";
 import { UserRole } from "@prisma/client";
 import { AddUserModal } from "./_components/add-user-modal";
+import { NextResponse } from "next/server";
 
 const USERS_PER_PAGE = 10;
 
@@ -37,13 +38,14 @@ export default async function ManageUsersPage({
   searchParams: {
     page?: string;
     search?: string;
-    role?: UserRole;
+    role?: UserRole | "all";
     sort?: string;
   };
 }) {
   const { page, search, role, sort } = await searchParams;
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") return redirect("/");
+  if (!session?.user || session.user.role !== "ADMIN")
+    return NextResponse.redirect("/");
 
   const currentPage = Number(page) || 1;
   const searchTerm = search || "";
@@ -84,7 +86,7 @@ export default async function ManageUsersPage({
   const totalUsers = await db.user.count({ where: whereClause });
   const pageCount = Math.ceil(totalUsers / USERS_PER_PAGE);
 
-  // Stats should reflect the entire user base, not just the filtered results
+  // Stats  reflect the entire user base, not just the filtered results
   const allUsersStats = await db.user.groupBy({
     by: ["role"],
     _count: {

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { EnrolledCourseCard } from "@/components/courses/enrolled-course-card";
 import { Card, CardContent } from "@/components/ui/card";
-import { SearchBar } from "./_components/search-bar"; // NEW IMPORT
+import { SearchBar } from "./_components/search-bar";
 
 export default async function MyLearningPage({
   searchParams,
@@ -22,7 +22,6 @@ export default async function MyLearningPage({
 
   const searchTerm = search || "";
 
-  // Prisma query now includes a `where` clause for the course title
   const enrollments = await db.enrollment.findMany({
     where: {
       userId: session.user.id,

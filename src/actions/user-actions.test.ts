@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
-import { updateUserRole, deleteUser, addUserByAdmin } from "./user-actions";
+import {
+  updateUserRole,
+  deleteUser,
+  addUserByAdmin,
+  completeUserProfile,
+} from "./user-actions";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { UserRole } from "@prisma/client";
@@ -59,13 +64,11 @@ describe("User Server Actions", () => {
 
       // Assert
       expect(result.success).toBe(true);
-      // --- CORRECTED ASSERTION ---
       expect(mockDbUserUpdate).toHaveBeenCalledTimes(1);
       expect(mockDbUserUpdate).toHaveBeenCalledWith({
         where: { id: targetUserId },
         data: { role: newRole },
       });
-      // --- CORRECTED ASSERTION ---
       expect(mockRevalidatePath).toHaveBeenCalledTimes(1);
       expect(mockRevalidatePath).toHaveBeenCalledWith("/admin/users");
     });
@@ -122,7 +125,6 @@ describe("User Server Actions", () => {
       // Assert
       expect(result.success).toBe(true);
       expect(result.message).toBe("User Deleted User deleted successfully.");
-      // --- CORRECTED ASSERTION ---
       expect(mockDbUserDelete).toHaveBeenCalledTimes(1);
       expect(mockDbUserDelete).toHaveBeenCalledWith({
         where: { id: targetUserId },
@@ -179,7 +181,6 @@ describe("User Server Actions", () => {
       // Assert
       expect(result.success).toBe(true);
       expect(result.temporaryPassword).toHaveLength(12);
-      // --- CORRECTED ASSERTIONS ---
       expect(mockDbUserFindUnique).toHaveBeenCalledTimes(1);
       expect(mockDbUserFindUnique).toHaveBeenCalledWith({
         where: { email: newUserdata.email },
@@ -194,7 +195,7 @@ describe("User Server Actions", () => {
         user: { id: generateMongoId(), role: UserRole.ADMIN },
       };
       mockGetServerSession.mockResolvedValue(adminSession);
-      mockDbUserFindUnique.mockResolvedValue({ id: generateMongoId() } as any); // User already exists
+      mockDbUserFindUnique.mockResolvedValue({ id: generateMongoId() } as any);
       const newUserdata = {
         name: "Existing User",
         email: "existing@example.com",
@@ -223,6 +224,79 @@ describe("User Server Actions", () => {
       await expect(addUserByAdmin(invalidData as any)).rejects.toThrow(
         "All fields are required."
       );
+    });
+  });
+
+  describe("completeUserProfile", () => {
+    it("should successfully update a new user's role to STUDENT", async () => {
+      // Arrange
+      const newUserId = generateMongoId();
+      const newUserSession = {
+        user: { id: newUserId, role: UserRole.NEW_USER },
+      };
+      mockGetServerSession.mockResolvedValue(newUserSession as any);
+      const chosenRole = UserRole.STUDENT;
+
+      // Act
+      const result = await completeUserProfile(chosenRole);
+
+      // Assert
+      expect(result.success).toBe(true);
+      expect(result.message).toBe("Profile updated successfully!");
+      expect(mockDbUserUpdate).toHaveBeenCalledTimes(1);
+      expect(mockDbUserUpdate).toHaveBeenCalledWith({
+        where: { id: newUserId },
+        data: { role: chosenRole },
+      });
+      expect(mockRevalidatePath).toHaveBeenCalledWith("/profile");
+    });
+
+    it("should successfully update a new user's role to INSTRUCTOR", async () => {
+      // Arrange
+      const newUserId = generateMongoId();
+      const newUserSession = {
+        user: { id: newUserId, role: UserRole.NEW_USER },
+      };
+      mockGetServerSession.mockResolvedValue(newUserSession as any);
+      const chosenRole = UserRole.INSTRUCTOR;
+
+      // Act
+      const result = await completeUserProfile(chosenRole);
+
+      // Assert
+      expect(result.success).toBe(true);
+      expect(mockDbUserUpdate).toHaveBeenCalledTimes(1);
+      expect(mockDbUserUpdate).toHaveBeenCalledWith({
+        where: { id: newUserId },
+        data: { role: chosenRole },
+      });
+    });
+
+    it("should throw an error if the user is not logged in", async () => {
+      // Arrange
+      mockGetServerSession.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(completeUserProfile(UserRole.STUDENT)).rejects.toThrow(
+        "Unauthorized: You must be logged in."
+      );
+      expect(mockDbUserUpdate).not.toHaveBeenCalled();
+    });
+
+    it("should throw an error if an invalid role is provided", async () => {
+      // Arrange
+      const newUserId = generateMongoId();
+      const newUserSession = {
+        user: { id: newUserId, role: UserRole.NEW_USER },
+      };
+      mockGetServerSession.mockResolvedValue(newUserSession as any);
+      const invalidRole = "SOME_INVALID_ROLE" as UserRole;
+
+      // Act & Assert
+      await expect(completeUserProfile(invalidRole)).rejects.toThrow(
+        "Invalid role selected."
+      );
+      expect(mockDbUserUpdate).not.toHaveBeenCalled();
     });
   });
 });

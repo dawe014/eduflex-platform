@@ -65,7 +65,7 @@ export const CourseActions = ({
   return (
     <div className="flex items-center gap-3">
       <Badge
-        variant={isPublished ? "success" : "secondary"}
+        variant={isPublished ? "default" : "secondary"}
         className="px-3 py-1"
       >
         {isPublished ? "Published" : "Draft"}
@@ -114,7 +114,7 @@ export const CourseActions = ({
             <AlertDialogAction
               onClick={onDelete}
               disabled={isLoading}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 gap-2"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 gap-2 text-white"
             >
               {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

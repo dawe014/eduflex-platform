@@ -1,10 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { toggleWishlist } from "./wishlist-actions"; // The action we're testing
+import { toggleWishlist } from "./wishlist-actions";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { Types } from "mongoose";
-import { UserRole } from "@prisma/client";
 
 // --- Mocking All External Dependencies ---
 vi.mock("next-auth");
@@ -58,7 +57,7 @@ describe("toggleWishlist Server Action", () => {
     expect(mockDbWishlistCreate).toHaveBeenCalledWith({
       data: { userId, courseId },
     });
-    expect(mockDbWishlistDelete).not.toHaveBeenCalled(); // Ensure delete was NOT called
+    expect(mockDbWishlistDelete).not.toHaveBeenCalled();
 
     // Check that revalidation was called
     expect(mockRevalidatePath).toHaveBeenCalledTimes(1);
@@ -93,7 +92,7 @@ describe("toggleWishlist Server Action", () => {
     expect(mockDbWishlistDelete).toHaveBeenCalledWith({
       where: { userId_courseId: { userId, courseId } },
     });
-    expect(mockDbWishlistCreate).not.toHaveBeenCalled(); // Ensure create was NOT called
+    expect(mockDbWishlistCreate).not.toHaveBeenCalled();
 
     expect(mockRevalidatePath).toHaveBeenCalledWith(path);
   });

@@ -33,7 +33,6 @@ const mockStripeSessionsCreate = vi.mocked(stripe.checkout.sessions.create);
 
 const generateMongoId = () => new Types.ObjectId().toHexString();
 
-// Main test suite for the createCheckoutSession server action
 describe("createCheckoutSession Server Action", () => {
   beforeEach(() => {
     vi.resetAllMocks();
@@ -161,8 +160,6 @@ describe("createCheckoutSession Server Action", () => {
     mockDbCourseFindUnique.mockResolvedValue(courseData as any);
     mockDbEnrollmentFindUnique.mockResolvedValue(null);
 
-    // --- THIS IS THE FIX ---
-    // We must mock the headers() function here as well
     mockHeaders.mockReturnValue(
       Promise.resolve({
         get: (key: string) =>

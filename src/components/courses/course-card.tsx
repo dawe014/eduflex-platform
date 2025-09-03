@@ -16,7 +16,6 @@ import { WishlistButton } from "./wishlist-button";
 import { Course, Category, Review, Enrollment, Lesson } from "@prisma/client";
 import { calculateTotalCourseDuration } from "@/lib/duration-helper";
 
-// ✅ Updated type to include chapters with lessons
 type CourseWithDetails = Course & {
   category: Category | null;
   reviews: Review[];
@@ -33,20 +32,17 @@ export const CourseCard = ({ course, isWishlisted }: CourseCardProps) => {
   const { id, title, imageUrl, category, price, reviews, enrollments } = course;
   const destination = `/courses/${id}`;
 
-  // ✅ Dynamic calculations
   const students = enrollments.length;
   const rating =
     reviews.length > 0
       ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
       : 0;
 
-  // ✅ NEW: Calculate lessons and duration dynamically
   const lessons = course.chapters.reduce(
     (sum, chapter) => sum + chapter.lessons.length,
     0
   );
-  const duration = calculateTotalCourseDuration(course.chapters); // Returns formatted string like "2h 45m"
-
+  const duration = calculateTotalCourseDuration(course.chapters);
   const handleActionClick = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     e.stopPropagation();
     e.preventDefault();
@@ -55,7 +51,6 @@ export const CourseCard = ({ course, isWishlisted }: CourseCardProps) => {
   return (
     <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl border-0 group/card">
       <Link href={destination} className="flex flex-col flex-grow">
-        {/* ✅ Course Image with Category Badge and Wishlist */}
         <CardHeader className="p-0 relative">
           <div className="relative w-full aspect-video overflow-hidden">
             <Image

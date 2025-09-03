@@ -1,4 +1,3 @@
-// File: src/components/auth/social.tsx
 "use client";
 
 import { signIn } from "next-auth/react";
@@ -34,7 +33,7 @@ const GoogleIcon = () => (
 export const Social = () => {
   const onClick = (provider: "google") => {
     signIn(provider, {
-      callbackUrl: "/dashboard", // Redirect to dashboard after successful login
+      callbackUrl: "/",
     });
   };
 

@@ -1,4 +1,3 @@
-// File: .../_components/lesson-access-form.tsx
 "use client";
 
 import * as z from "zod";
@@ -35,7 +34,6 @@ const formSchema = z.object({
 export const LessonAccessForm = ({
   initialData,
   courseId,
-  chapterId,
   lessonId,
 }: LessonAccessFormProps) => {
   const [isEditing, setIsEditing] = useState(false);

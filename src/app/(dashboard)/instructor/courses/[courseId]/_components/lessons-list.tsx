@@ -1,4 +1,3 @@
-// File: src/app/(dashboard)/instructor/courses/[courseId]/_components/lessons-list.tsx
 "use client";
 
 import { Lesson } from "@prisma/client";
@@ -27,7 +26,7 @@ export const LessonsList = ({ items, onReorder, onEdit }: LessonsListProps) => {
           <div className="ml-auto pr-2 flex items-center gap-x-2">
             {lesson.isFree && <Badge>Free</Badge>}
             <Link
-              href={`/instructor/courses/${lesson.courseId}/lessons/${lesson.id}`}
+              href={`/instructor/courses/${lesson.chapterId}/lessons/${lesson.id}`}
             >
               <Pencil className="w-4 h-4 cursor-pointer hover:opacity-75 transition" />
             </Link>

@@ -13,7 +13,6 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-// --- Type definition for a single core value item ---
 type Value = {
   icon: React.ReactElement<any>;
   title: string;
@@ -49,7 +48,6 @@ const ValueCard: React.FC<ValueCardProps> = ({
   </Card>
 );
 
-// --- Strongly-typed placeholder data ---
 const values: Value[] = [
   {
     icon: <BookOpen />,
@@ -201,7 +199,7 @@ const AboutPage: React.FC = () => {
           </div>
           <div className="relative h-96 w-full rounded-2xl overflow-hidden shadow-2xl group">
             <Image
-              src="/images/mission-vision.jpg" // A relevant, inspiring image
+              src="/images/mission-vision.jpg"
               alt="A diverse group of students collaborating online"
               layout="fill"
               objectFit="cover"

@@ -16,7 +16,7 @@ import { Pencil, Check, X, Tag } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Course } from "@prisma/client";
-import { ComboboxDemo } from "@/components/ui/combobox"; // ✅ your Combobox
+import { ComboboxDemo } from "@/components/ui/combobox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -121,9 +121,8 @@ export const CategoryForm = ({
                       <ComboboxDemo
                         options={options}
                         value={field.value}
-                        onChange={field.onChange} // ✅ fixes integration
+                        onChange={field.onChange}
                         placeholder="Select a category..."
-                        emptyMessage="No categories found"
                       />
                     </FormControl>
                     <FormMessage />

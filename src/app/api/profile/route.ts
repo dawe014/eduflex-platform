@@ -18,13 +18,12 @@ export async function PATCH(req: Request) {
       where: { id: session.user.id },
       data: {
         name: values.name,
-        bio: values.bio, // This will be undefined if not provided, which is fine
+        bio: values.bio,
       },
     });
 
     return NextResponse.json(updatedUser);
   } catch (error) {
-    console.log("[PROFILE_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

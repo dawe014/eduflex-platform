@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { ReviewModal } from "./review-modal";
 
-// Define the comprehensive type for the course object
 type CourseWithDetails = Course & {
   chapters: (Chapter & { lessons: Lesson[] })[];
   instructor: { name: string; image?: string | null };
@@ -22,7 +21,7 @@ type CourseWithDetails = Course & {
 
 interface CourseSidebarProps {
   course: CourseWithDetails;
-  completedLessonIds: Set<string>; // Use a Set for efficient lookups
+  completedLessonIds: Set<string>;
   progressPercentage: number;
   existingReview: Review | null;
 }
@@ -39,7 +38,6 @@ export const CourseSidebar = ({
     0
   );
 
-  // Find the chapter that contains the currently active lesson to keep it open by default
   const activeChapterId = course.chapters.find((chapter) =>
     chapter.lessons.some((lesson) => lesson.id === params.lessonId)
   )?.id;

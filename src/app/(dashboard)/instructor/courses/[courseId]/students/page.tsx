@@ -35,7 +35,6 @@ export default async function CourseStudentsPage({
   const session = await getServerSession(authOptions);
   if (!session?.user) return redirect("/");
 
-  // Fetch the course and all its related data for calculations
   const course = await db.course.findUnique({
     where: {
       id: courseId,
@@ -53,7 +52,7 @@ export default async function CourseStudentsPage({
         include: {
           lessons: {
             where: { isPublished: true },
-            // Include progress for ALL users to calculate for each student
+
             include: {
               progress: {
                 where: { isCompleted: true },
@@ -69,16 +68,13 @@ export default async function CourseStudentsPage({
     return notFound();
   }
 
-  // --- Dynamic Data Calculations ---
   const totalStudents = course.enrollments.length;
   const totalLessons = course.chapters.reduce(
     (acc, chapter) => acc + chapter.lessons.length,
     0
   );
 
-  // Map enrollments to include each student's progress
   const studentsWithProgress = course.enrollments.map((enrollment) => {
-    // Count how many lessons this specific student has completed
     const completedLessonsCount = course.chapters.reduce((acc, chapter) => {
       return (
         acc +
@@ -105,9 +101,6 @@ export default async function CourseStudentsPage({
           0
         ) / totalStudents
       : 0;
-
-  // Placeholder for "Active this week"
-  const activeThisWeek = Math.floor(totalStudents * 0.3); // Example: 30% are active
 
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-6">
@@ -158,23 +151,7 @@ export default async function CourseStudentsPage({
             </div>
           </CardContent>
         </Card>
-        <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Active This Week
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {activeThisWeek}
-                </p>
-              </div>
-              <div className="p-3 bg-green-100 rounded-full">
-                <BookOpen className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
         <Card className="border-0 shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -202,7 +179,6 @@ export default async function CourseStudentsPage({
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input placeholder="Search students..." className="pl-10" />
             </div>
-            {/* Functional filtering would require client components and state management */}
           </div>
         </CardContent>
       </Card>

@@ -10,25 +10,32 @@ export default withAuth(
     const { token } = req.nextauth;
     const userRole = token?.role as UserRole;
 
-    // --- Role-Based Authorization ---
+    // --- NEW: Force profile completion for new users ---
+    // If the user's role is NEW_USER, they can ONLY access the complete-profile page.
+    console.log("role:", userRole, "path:", pathname);
+    if (userRole === "NEW_USER" && pathname !== "/register/complete-profile") {
+      return NextResponse.redirect(
+        new URL("/register/complete-profile", req.url)
+      );
+    }
 
-    // 1. Admin Routes
+    // If a completed user tries to access the completion page, redirect them away.
+    if (userRole !== "NEW_USER" && pathname === "/register/complete-profile") {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    // --- Role-Based Authorization (remains the same) ---
     if (pathname.startsWith("/admin")) {
       if (userRole !== "ADMIN") {
-        // If a logged-in user is not an admin, send them to their dashboard
-        return NextResponse.redirect(new URL("/dashboard", req.url));
+        return NextResponse.redirect(new URL("/", req.url));
       }
     }
-
-    // 2. Instructor Routes
     if (pathname.startsWith("/instructor")) {
       if (userRole !== "INSTRUCTOR") {
-        // If a logged-in user is not an instructor, send them to their dashboard
         return NextResponse.redirect(new URL("/dashboard", req.url));
       }
     }
 
-    // If no specific role-based rules are broken, allow the request
     return NextResponse.next();
   },
 

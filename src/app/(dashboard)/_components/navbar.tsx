@@ -3,7 +3,7 @@
 import { UserButton } from "@/app/(marketing)/_components/user-button";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useMobileSidebar } from "@/hooks/use-mobile-sidebar"; // Assuming this hook exists
+import { useMobileSidebar } from "@/hooks/use-mobile-sidebar";
 
 export const Navbar = () => {
   const { onOpen } = useMobileSidebar();

@@ -31,12 +31,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ContactMessage, User } from "@prisma/client";
+import { ContactMessage } from "@prisma/client";
 import {
   MoreHorizontal,
   Trash2,
   Archive,
-  CheckCircle,
   Mail,
   Eye,
   Reply,
@@ -69,7 +68,6 @@ export const MessageActions = ({ message }: { message: MessageWithUser }) => {
       startTransition(async () => {
         try {
           await updateMessageStatus(message.id, "READ");
-          toast.success("Message marked as read");
         } catch (error: any) {
           toast.error(error.message);
         }
@@ -320,7 +318,7 @@ export const MessageActions = ({ message }: { message: MessageWithUser }) => {
             <AlertDialogAction
               onClick={onDelete}
               disabled={isPending}
-              className="flex-1 sm:flex-none order-1 sm:order-2 bg-red-600 hover:bg-red-700"
+              className="flex-1 sm:flex-none order-1 sm:order-2 bg-red-600 hover:bg-red-700 text-white"
             >
               {isPending ? (
                 <div className="flex items-center gap-2">

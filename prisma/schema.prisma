@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,7 +11,8 @@ datasource db {
 enum UserRole {
   STUDENT
   INSTRUCTOR
-  ADMIN // Added for future scalability
+  ADMIN 
+  NEW_USER 
 }
 
 // User model for authentication and roles
@@ -25,8 +23,8 @@ model User {
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
-  role           UserRole  @default(STUDENT)
-  bio            String? // Added for instructor profiles
+  role           UserRole  @default(NEW_USER )
+  bio            String? 
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
@@ -102,12 +100,12 @@ model Course {
   wishlist Wishlist[]
 
   learnings       String[]
-  requirements    String[] // An array of strings for course requirements
-  includes        String[] // An array of strings for "This course includes" points
+  requirements    String[] 
+  includes        String[] 
 
 }
 
-// Chapter model - NEW!
+// Chapter model
 model Chapter {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
@@ -126,7 +124,7 @@ model Chapter {
   updatedAt   DateTime @updatedAt
 }
 
-// Lesson model - Updated to belong to a Chapter
+// Lesson model
 model Lesson {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
@@ -160,7 +158,7 @@ model Enrollment {
   @@unique([userId, courseId])
 }
 
-// UserProgress model - Updated for clarity
+// UserProgress model 
 model UserProgress {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   isCompleted Boolean  @default(false)
@@ -202,7 +200,7 @@ model Wishlist {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, courseId]) // A user can only wishlist a course once
+  @@unique([userId, courseId]) 
 }
 
 enum MessageStatus {
@@ -213,14 +211,19 @@ enum MessageStatus {
 
 model ContactMessage {
   id        String        @id @default(auto()) @map("_id") @db.ObjectId
-  name      String        // Guest's name
-  email     String        // Guest's email
+  name      String        
+  email     String        
   subject   String
   message   String
   status    MessageStatus @default(UNREAD)
   createdAt DateTime      @default(now())
 
-  // This is an OPTIONAL link to a registered user account
   userId    String?       @db.ObjectId
   user      User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Setting {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  key   String @unique 
+  value Json  
 }

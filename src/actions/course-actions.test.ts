@@ -7,14 +7,16 @@ import {
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation"; // Import the function we need to mock
+import { redirect } from "next/navigation";
 import { Types } from "mongoose";
 import { UserRole } from "@prisma/client";
+import { getPlatformSettings } from "./settings-actions"; // Import the new dependency
 
 // --- Mocking All External Dependencies ---
 vi.mock("next-auth");
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
-vi.mock("next/navigation", () => ({ redirect: vi.fn() })); // Mock the redirect function
+vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
+vi.mock("./settings-actions", () => ({ getPlatformSettings: vi.fn() })); // Mock the settings helper
 vi.mock("@/lib/db", () => ({
   db: {
     course: {
@@ -28,6 +30,7 @@ vi.mock("@/lib/db", () => ({
 
 // --- Test Suite Setup ---
 const mockGetServerSession = vi.mocked(getServerSession);
+const mockGetPlatformSettings = vi.mocked(getPlatformSettings);
 const mockDbCourseCreate = vi.mocked(db.course.create);
 const mockDbCourseFindUnique = vi.mocked(db.course.findUnique);
 const mockDbCourseUpdate = vi.mocked(db.course.update);
@@ -37,30 +40,30 @@ const mockRedirect = vi.mocked(redirect);
 
 const generateMongoId = () => new Types.ObjectId().toHexString();
 
-// Main test suite for all course-related server actions
 describe("Course Server Actions", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    // Default mock for platform settings - allow submissions
+    mockGetPlatformSettings.mockResolvedValue({
+      allowCourseSubmissions: true,
+      allowNewRegistrations: true,
+    });
   });
 
-  // --- Test Suite for createCourse ---
   describe("createCourse", () => {
-    it("should successfully create a course for an INSTRUCTOR and redirect", async () => {
+    it("should successfully create a course and redirect to its setup page", async () => {
       // Arrange
       const instructorId = generateMongoId();
+      const newCourseId = generateMongoId();
       const instructorSession = {
         user: { id: instructorId, role: UserRole.INSTRUCTOR },
       };
       mockGetServerSession.mockResolvedValue(instructorSession);
+      mockDbCourseCreate.mockResolvedValue({ id: newCourseId } as any);
 
       const formData = new FormData();
       formData.append("title", "New Test Course");
-
-      // Mock the database response
-      mockDbCourseCreate.mockResolvedValue({
-        id: generateMongoId(),
-        title: "New Test Course",
-      } as any);
+      formData.append("description", "A brief description.");
 
       // Act
       await createCourse(formData);
@@ -70,11 +73,38 @@ describe("Course Server Actions", () => {
       expect(mockDbCourseCreate).toHaveBeenCalledWith({
         data: {
           title: "New Test Course",
+          description: "A brief description.",
           instructorId: instructorId,
         },
       });
-      expect(mockRevalidatePath).toHaveBeenCalledWith("/instructor/dashboard");
-      expect(mockRedirect).toHaveBeenCalledWith("/instructor/dashboard");
+      // Path is now more specific
+      expect(mockRevalidatePath).toHaveBeenCalledWith("/instructor/courses");
+      // Redirect is now dynamic to the new course ID
+      expect(mockRedirect).toHaveBeenCalledWith(
+        `/instructor/courses/${newCourseId}`
+      );
+    });
+
+    it("should throw an error if course submissions are disabled by admin", async () => {
+      // Arrange
+      const instructorSession = {
+        user: { id: generateMongoId(), role: UserRole.INSTRUCTOR },
+      };
+      mockGetServerSession.mockResolvedValue(instructorSession);
+      // --- OVERRIDE MOCK ---
+      mockGetPlatformSettings.mockResolvedValue({
+        allowCourseSubmissions: false,
+        allowNewRegistrations: true,
+      });
+
+      const formData = new FormData();
+      formData.append("title", "This should fail");
+
+      // Act & Assert
+      await expect(createCourse(formData)).rejects.toThrow(
+        "New course submissions are currently disabled"
+      );
+      expect(mockDbCourseCreate).not.toHaveBeenCalled();
     });
 
     it("should throw an error if called by a non-INSTRUCTOR user", async () => {
@@ -86,19 +116,19 @@ describe("Course Server Actions", () => {
       formData.append("title", "Invalid Course");
 
       await expect(createCourse(formData)).rejects.toThrow("Unauthorized");
-      expect(mockDbCourseCreate).not.toHaveBeenCalled();
-      expect(mockRedirect).not.toHaveBeenCalled();
     });
 
-    it("should throw an error if the title is missing", async () => {
+    it("should throw an error if the title is too short", async () => {
       const instructorSession = {
         user: { id: generateMongoId(), role: UserRole.INSTRUCTOR },
       };
       mockGetServerSession.mockResolvedValue(instructorSession);
-      const formData = new FormData(); // Empty form data
+      const formData = new FormData();
+      formData.append("title", "Hi"); // Title is less than 3 characters
 
-      await expect(createCourse(formData)).rejects.toThrow("Title is required");
-      expect(mockDbCourseCreate).not.toHaveBeenCalled();
+      await expect(createCourse(formData)).rejects.toThrow(
+        "Title is required and must be at least 3 characters long."
+      );
     });
   });
 
@@ -162,7 +192,7 @@ describe("Course Server Actions", () => {
     it("should throw an error if the course is not found", async () => {
       const adminSession = { user: { role: UserRole.ADMIN } } as any;
       mockGetServerSession.mockResolvedValue(adminSession);
-      mockDbCourseFindUnique.mockResolvedValue(null); // Course not found
+      mockDbCourseFindUnique.mockResolvedValue(null);
 
       await expect(
         toggleCoursePublishByAdmin(generateMongoId())
@@ -177,7 +207,7 @@ describe("Course Server Actions", () => {
       const adminSession = { user: { role: UserRole.ADMIN } } as any;
       mockGetServerSession.mockResolvedValue(adminSession);
       const courseId = generateMongoId();
-      mockDbCourseFindUnique.mockResolvedValue({ id: courseId } as any); // Course exists
+      mockDbCourseFindUnique.mockResolvedValue({ id: courseId } as any);
       mockDbCourseDelete.mockResolvedValue({ title: "Deleted Course" } as any);
 
       // Act

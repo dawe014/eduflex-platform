@@ -1,4 +1,3 @@
-// File: src/app/(marketing)/_components/mobile-nav.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -46,7 +45,7 @@ export const MobileNav = () => {
   ];
 
   const teachRoute = {
-    href: "/instructor/dashboard",
+    href: "/instructor/courses",
     label: "Teach on EduFlex",
     icon: GraduationCap,
     active: pathname.startsWith("/instructor"),
@@ -118,7 +117,7 @@ export const MobileNav = () => {
                   ))}
 
                   {/* Teach Route */}
-                  {(session?.user?.role === "INSTRUCTOR" || !session) && (
+                  {session?.user?.role === "INSTRUCTOR" && (
                     <Link
                       href={teachRoute.href}
                       onClick={() => setIsOpen(false)}

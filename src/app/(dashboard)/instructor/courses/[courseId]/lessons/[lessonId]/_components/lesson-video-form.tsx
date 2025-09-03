@@ -1,4 +1,3 @@
-// File: .../_components/lesson-video-form.tsx
 "use client";
 
 import * as z from "zod";
@@ -27,7 +26,6 @@ const formSchema = z.object({
 export const LessonVideoForm = ({
   initialData,
   courseId,
-  chapterId,
   lessonId,
 }: LessonVideoFormProps) => {
   const [isEditing, setIsEditing] = useState(false);

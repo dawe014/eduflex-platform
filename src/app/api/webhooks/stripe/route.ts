@@ -1,4 +1,3 @@
-// File: src/app/api/webhooks/stripe/route.ts
 import { db } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";

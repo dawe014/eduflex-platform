@@ -35,7 +35,6 @@ export default async function LessonIdPage({
     return redirect("/");
   }
 
-  // CORRECT: Destructure params directly
   const { courseId, lessonId } = await params;
 
   const lesson = await db.lesson.findUnique({
@@ -44,14 +43,14 @@ export default async function LessonIdPage({
       chapter: {
         courseId: courseId,
         course: {
-          instructorId: session.user.id, // Security: Verify ownership
+          instructorId: session.user.id,
         },
       },
     },
     include: {
       chapter: {
         select: {
-          id: true, // Fetch the chapterId
+          id: true,
           title: true,
           position: true,
           course: {
@@ -69,7 +68,6 @@ export default async function LessonIdPage({
     return notFound();
   }
 
-  // The chapterId is now available from the fetched lesson data
   const chapterId = lesson.chapter.id;
 
   const requiredFields = [
@@ -83,7 +81,6 @@ export default async function LessonIdPage({
   const completionPercentage = (completedFields / totalFields) * 100;
   const isComplete = requiredFields.every(Boolean);
 
-  // Placeholder for duration
   const formattedDuration = lesson.duration ? lesson.duration : "Not set";
 
   return (
@@ -123,7 +120,7 @@ export default async function LessonIdPage({
         <LessonActions
           disabled={!isComplete}
           courseId={courseId}
-          chapterId={chapterId} // Pass the fetched chapterId
+          chapterId={chapterId}
           lessonId={lessonId}
           isPublished={lesson.isPublished}
         />

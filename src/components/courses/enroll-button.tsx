@@ -1,11 +1,10 @@
-// File: src/components/courses/enroll-button.tsx
 "use client";
 
 import { createCheckoutSession } from "@/actions/checkout-actions";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { toast } from "sonner"; // We will add this library
+import { toast } from "sonner";
 
 interface EnrollButtonProps {
   courseId: string;

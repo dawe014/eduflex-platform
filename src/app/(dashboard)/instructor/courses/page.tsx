@@ -44,7 +44,6 @@ export default async function InstructorCoursesPage({
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return redirect("/");
-  // Determine current page
   const { page } = await searchParams;
 
   const currentPage = Number(page) || 1;

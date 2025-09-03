@@ -3,7 +3,6 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-// Generic PATCH for updating lesson details (title, description, isFree)
 export async function PATCH(
   req: Request,
   { params }: { params: { courseId: string; lessonId: string } }
@@ -63,15 +62,12 @@ export async function DELETE(
       return new NextResponse("Not Found", { status: 404 });
     }
 
-    // Advanced: Here you could add logic to delete associated video files from UploadThing
-
     const deletedLesson = await db.lesson.delete({
       where: { id: lessonId },
     });
 
     return NextResponse.json(deletedLesson);
   } catch (error) {
-    console.log("[COURSE_LESSON_DELETE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

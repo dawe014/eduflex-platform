@@ -28,10 +28,7 @@ export const CourseNavbar = ({
   progressPercentage,
   existingReview,
 }: CourseNavbarProps) => {
-  // Convert Set to Array for prop drilling if needed, but not required here
-  // Assuming CourseSidebar is updated to accept a Set
-  const completedLessonIds = new Set<string>(); // Placeholder for type consistency
-  // In reality, this data is already calculated and passed down correctly
+  const completedLessonIds = new Set<string>();
 
   return (
     <div className="w-full bg-white/80 backdrop-blur-md border-b border-gray-200/50 h-20 px-4 sm:px-6">
@@ -47,7 +44,7 @@ export const CourseNavbar = ({
             <SheetContent side="left" className="p-0 w-80">
               <CourseSidebar
                 course={course}
-                completedLessonIds={new Set()} // Pass down correctly
+                completedLessonIds={new Set()}
                 progressPercentage={progressPercentage}
                 existingReview={existingReview}
               />

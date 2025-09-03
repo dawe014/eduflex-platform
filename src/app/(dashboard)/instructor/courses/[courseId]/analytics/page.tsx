@@ -48,7 +48,6 @@ const groupEnrollmentsByMonth = (enrollments: { createdAt: Date }[]) => {
   return monthNames.map((name) => ({
     name,
     students: monthlyData[name] || 0,
-    // You can also calculate revenue per month if needed
     revenue: (monthlyData[name] || 0) * (enrollments[0]?.course?.price || 0),
   }));
 };
@@ -92,7 +91,6 @@ export default async function CourseAnalyticsPage({
     return notFound();
   }
 
-  // --- Dynamic Data Calculations ---
   const totalStudents = course.enrollments.length;
   const totalRevenue = (course.price || 0) * totalStudents;
   const totalChapters = course.chapters.length;
@@ -110,7 +108,6 @@ export default async function CourseAnalyticsPage({
 
   const chartData = groupEnrollmentsByMonth(course.enrollments as any);
 
-  // Calculate completion rate
   const completedStudents = new Set<string>();
   for (const chapter of course.chapters) {
     for (const lesson of chapter.lessons) {

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pencil, Check, X, Hourglass } from "lucide-react"; // Using Hourglass icon
+import { Pencil, Check, X, Hourglass } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Lesson } from "@prisma/client";
@@ -30,7 +30,7 @@ const formSchema = z.object({
     .min(1, { message: "Duration is required" })
     .regex(/^\d{1,2}:\d{2}$/, {
       message: "Duration must be in HH:MM or H:MM format (e.g., 05:30 or 5:30)",
-    }), // Added regex for time format validation
+    }),
 });
 
 export const LessonDurationForm = ({
@@ -54,7 +54,7 @@ export const LessonDurationForm = ({
       await fetch(`/api/courses/${courseId}/lessons/${lessonId}`, {
         method: "PATCH",
         body: JSON.stringify(values),
-        headers: { "Content-Type": "application/json" }, // Ensure headers are set for PATCH
+        headers: { "Content-Type": "application/json" },
       });
       toast.success("Lesson duration updated successfully");
       toggleEdit();
@@ -100,7 +100,7 @@ export const LessonDurationForm = ({
             {initialData.duration ? (
               <p className="text-gray-700 leading-relaxed">
                 {initialData.duration} minutes
-              </p> // Added "minutes" for clarity, adjust as needed
+              </p>
             ) : (
               <p className="text-gray-500 italic">No duration set</p>
             )}
@@ -116,7 +116,7 @@ export const LessonDurationForm = ({
                     <FormControl>
                       <Input
                         disabled={isSubmitting}
-                        placeholder="e.g., '10:30' (MM:SS)" // Clarified placeholder
+                        placeholder="e.g., '10:30' (MM:SS)"
                         {...field}
                       />
                     </FormControl>

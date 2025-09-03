@@ -1,4 +1,3 @@
-// File: src/actions/checkout-actions.ts
 "use server";
 
 import { authOptions } from "@/lib/auth";
@@ -42,11 +41,9 @@ export async function createCheckoutSession(courseId: string) {
     throw new Error("You are already enrolled in this course.");
   }
 
-  // --- THE FIX IS HERE ---
   // Await the headers() function before using it
   const headersList = await headers();
   const origin = headersList.get("origin") || "http://localhost:3000";
-  // --- END OF FIX ---
 
   // Create a Stripe Checkout Session
   const stripeSession = await stripe.checkout.sessions.create({
@@ -67,7 +64,6 @@ export async function createCheckoutSession(courseId: string) {
     mode: "payment",
     success_url: `${origin}/courses/${course.id}?success=1`,
     cancel_url: `${origin}/courses/${course.id}?canceled=1`,
-    // IMPORTANT: Add metadata to link the session to our user and course
     metadata: {
       courseId: course.id,
       userId: userId,

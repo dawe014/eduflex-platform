@@ -1,4 +1,3 @@
-// File: src/app/(dashboard)/instructor/courses/[courseId]/page.tsx
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
@@ -90,7 +89,6 @@ export default async function InstructorCourseIdPage({
   const completionPercentage = (completedFields / totalFields) * 100;
   const isComplete = requiredFields.every(Boolean);
 
-  // Calculate course statistics
   const totalLessons = course.chapters.reduce(
     (acc, chapter) => acc + chapter.lessons.length,
     0

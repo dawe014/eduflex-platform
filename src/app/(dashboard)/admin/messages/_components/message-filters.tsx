@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { Search, Filter } from "lucide-react";
 import { MessageStatus } from "@prisma/client";
-import { Button } from "@/components/ui/button";
 
 export const MessageFilters = () => {
   const searchParams = useSearchParams();

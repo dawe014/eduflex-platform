@@ -38,13 +38,12 @@ export default async function HomePage() {
         },
       },
     },
-    take: 3, // Limit to 3 for a clean grid
+    take: 3,
     orderBy: {
-      enrollments: { _count: "desc" }, // Most popular
+      enrollments: { _count: "desc" },
     },
   });
 
-  // --- 2. Fetch User Wishlist ---
   const userWishlist = session?.user
     ? await db.wishlist.findMany({
         where: { userId: session.user.id },

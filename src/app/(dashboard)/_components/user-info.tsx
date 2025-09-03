@@ -1,10 +1,9 @@
-// File: src/app/(dashboard)/_components/user-info.tsx
 "use client";
 
 import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Crown, Star } from "lucide-react";
+import { Star } from "lucide-react";
 
 export const UserInfo = () => {
   const { data: session } = useSession();

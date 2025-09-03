@@ -37,14 +37,14 @@ export const SidebarRoutes = () => {
       href: "/wishlist",
     },
     {
+      icon: CreditCard,
+      label: "Billing",
+      href: "/billing",
+    },
+    {
       icon: User,
       label: "Profile",
       href: "/profile",
-    },
-    {
-      icon: Settings,
-      label: "Settings",
-      href: "/settings",
     },
   ];
 
@@ -74,11 +74,6 @@ export const SidebarRoutes = () => {
       label: "Profile",
       href: "/profile",
     },
-    {
-      icon: Settings,
-      label: "Settings",
-      href: "/settings",
-    },
   ];
 
   const adminRoutes = [
@@ -102,11 +97,7 @@ export const SidebarRoutes = () => {
       label: "Messages",
       href: "/admin/messages",
     },
-    {
-      icon: Shield,
-      label: "Moderation",
-      href: "/admin/moderation",
-    },
+
     {
       icon: Settings,
       label: "Platform Settings",

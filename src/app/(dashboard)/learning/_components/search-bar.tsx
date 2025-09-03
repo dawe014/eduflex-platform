@@ -10,7 +10,6 @@ export const SearchBar = () => {
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  // Debounce the callback to avoid excessive database queries while the user is typing
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
     if (term) {

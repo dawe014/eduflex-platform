@@ -1,4 +1,3 @@
-// File: src/app/(dashboard)/_components/sidebar-item.tsx
 "use client";
 
 import { LucideIcon } from "lucide-react";

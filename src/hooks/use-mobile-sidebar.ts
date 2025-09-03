@@ -1,4 +1,3 @@
-// File: src/hooks/use-mobile-sidebar.ts
 "use client";
 
 import { create } from "zustand";

@@ -8,7 +8,6 @@ import { Star, Users, BookOpen, Calendar, Award, Play } from "lucide-react";
 import { VideoPlayerModal } from "@/components/courses/video-player-modal";
 import { Course, Category, Review, Enrollment } from "@prisma/client";
 
-// Define a comprehensive type for the course data this component expects
 type CourseHeroProps = {
   course: Course & {
     category: Category | null;
@@ -18,7 +17,6 @@ type CourseHeroProps = {
   };
   totalLessons: number;
   averageRating: number;
-  // Pass the first previewable lesson's data as a prop
   previewLesson: { title: string; videoUrl: string } | null;
 };
 
@@ -35,7 +33,6 @@ export const CourseHero = ({
 
   return (
     <>
-      {/* The modal is here, ready to be triggered */}
       {previewLesson && (
         <VideoPlayerModal
           isOpen={isModalOpen}
@@ -115,7 +112,6 @@ export const CourseHero = ({
                 />
                 <div className="absolute inset-0 bg-black/40 transition-colors group-hover:bg-black/50" />
 
-                {/* Only show the play button if a preview is available */}
                 {previewLesson && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="bg-white p-4 rounded-full cursor-pointer hover:scale-110 transition-transform shadow-lg">

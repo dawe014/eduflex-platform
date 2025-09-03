@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CheckCircle, XCircle } from "lucide-react";
-import { useConfettiStore } from "@/hooks/use-confetti-store"; // Fun addition!
+import { useConfettiStore } from "@/hooks/use-confetti-store";
 
 interface CompleteButtonProps {
   courseId: string;
@@ -22,14 +22,14 @@ export const CompleteButton = ({
 }: CompleteButtonProps) => {
   const router = useRouter();
   const pathname = usePathname();
-  const confetti = useConfettiStore(); // Fun addition!
+  const confetti = useConfettiStore();
 
   const onClick = async () => {
     try {
       await toggleLessonComplete(lessonId, pathname);
 
       if (!isCompleted && !nextLessonId) {
-        confetti.onOpen(); // Fun: confetti when completing the last lesson
+        confetti.onOpen();
       }
 
       if (!isCompleted && nextLessonId) {
@@ -48,7 +48,7 @@ export const CompleteButton = ({
     <Button
       onClick={onClick}
       type="button"
-      variant={isCompleted ? "outline" : "success"} // requires adding a success variant
+      variant={isCompleted ? "outline" : "success"}
       className="w-full md:w-auto"
     >
       {isCompleted ? "Mark as not complete" : "Mark as complete"}

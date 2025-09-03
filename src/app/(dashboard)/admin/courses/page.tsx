@@ -25,7 +25,7 @@ export default async function ManageCoursesPage({
   searchParams: {
     page?: string;
     search?: string;
-    status?: "published" | "draft";
+    status?: "published" | "draft" | "all";
   };
 }) {
   const { page, search, status } = await searchParams;

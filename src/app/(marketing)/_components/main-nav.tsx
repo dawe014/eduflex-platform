@@ -1,4 +1,3 @@
-// File: src/app/(marketing)/_components/main-nav.tsx
 "use client";
 
 import { useSession } from "next-auth/react";
@@ -35,7 +34,7 @@ export const MainNav = () => {
   ];
 
   const teachRoute = {
-    href: "/instructor/dashboard",
+    href: "/instructor/courses",
     label: "Teach",
     active: pathname.startsWith("/instructor"),
   };
@@ -57,8 +56,7 @@ export const MainNav = () => {
         </Link>
       ))}
 
-      {/* Only show "Teach" link if user is an instructor OR not logged in */}
-      {(session?.user?.role === "INSTRUCTOR" || !session) && (
+      {session?.user?.role === "INSTRUCTOR" && (
         <Link
           key={teachRoute.href}
           href={teachRoute.href}

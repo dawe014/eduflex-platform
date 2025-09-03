@@ -34,6 +34,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
 
+        if (user.role === "NEW_USER") {
+          throw new Error("Account not fully set up. Please register first.");
+        }
+
         const isCorrectPassword = await bcrypt.compare(
           credentials.password,
           user.hashedPassword
@@ -48,22 +52,22 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token }) {
-      if (!token.sub) return token;
+    async jwt({ token, user, trigger, session }) {
+      if (user) {
+        token.role = (user as any).role;
+        token.id = user.id;
+      }
 
-      const existingUser = await db.user.findUnique({
-        where: { id: token.sub },
-      });
+      if (trigger === "update" && session?.role) {
+        token.role = session.role;
+      }
 
-      if (!existingUser) return token;
-
-      token.role = existingUser.role;
       return token;
     },
     session({ session, token }) {
       if (session.user) {
         session.user.role = token.role as UserRole;
-        session.user.id = token.sub as string;
+        session.user.id = token.id as string;
       }
       return session;
     },

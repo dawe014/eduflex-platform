@@ -53,7 +53,7 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
       });
       if (!response.ok) throw new Error("Failed to update profile");
       toast.success("Profile updated successfully!");
-      router.refresh(); // Refreshes the server component to show the new name in the header
+      router.refresh();
     } catch (error: any) {
       toast.error(error.message || "Something went wrong.");
     }

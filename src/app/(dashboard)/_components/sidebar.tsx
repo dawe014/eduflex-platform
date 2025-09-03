@@ -1,4 +1,3 @@
-// File: src/app/(dashboard)/_components/sidebar.tsx
 import { Logo } from "./logo";
 import { SidebarRoutes } from "./sidebar-routes";
 import { UserInfo } from "./user-info";

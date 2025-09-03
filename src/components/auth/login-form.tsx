@@ -1,4 +1,3 @@
-// File: src/components/auth/login-form.tsx
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -55,7 +54,7 @@ export const LoginForm = () => {
         toast.success("Welcome back!", {
           description: "You have successfully signed in to your account.",
         });
-        router.push("/dashboard");
+        router.push("/");
       }
     } catch (error) {
       toast.error("Connection error", {

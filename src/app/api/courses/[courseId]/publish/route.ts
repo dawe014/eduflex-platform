@@ -1,4 +1,3 @@
-// File: src/app/api/courses/[courseId]/publish/route.ts
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
@@ -24,7 +23,7 @@ export async function PATCH(
     }
 
     // Check if all required fields are filled
-    const hasPublishedLesson = course.lessons.some((lesson) => lesson.videoUrl); // Simplified check
+    const hasPublishedLesson = course.lessons.some((lesson) => lesson.videoUrl);
     if (
       !course.title ||
       !course.description ||
@@ -43,7 +42,6 @@ export async function PATCH(
 
     return NextResponse.json(publishedCourse);
   } catch (error) {
-    console.log("[COURSE_PUBLISH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

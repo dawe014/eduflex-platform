@@ -40,7 +40,6 @@ export async function POST(
 
     return NextResponse.json(chapter);
   } catch (error) {
-    console.log("[CHAPTERS_POST]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

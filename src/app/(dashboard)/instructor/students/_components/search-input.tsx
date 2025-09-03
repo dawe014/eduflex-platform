@@ -10,10 +10,9 @@ export const SearchInput = () => {
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  // Debounce the callback to avoid sending too many requests while typing
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
-    params.set("page", "1"); // Reset to first page on new search
+    params.set("page", "1");
     if (term) {
       params.set("search", term);
     } else {

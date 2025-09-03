@@ -7,7 +7,6 @@ import {
   Archive,
   User,
   Clock,
-  Search,
 } from "lucide-react";
 import {
   Table,
@@ -81,7 +80,7 @@ export default async function AdminMessagesPage({
   const filteredCount = await db.contactMessage.count({ where: whereClause });
   const pageCount = Math.ceil(filteredCount / MESSAGES_PER_PAGE);
 
-  // --- Stats (fetch these separately so they aren't affected by filters) ---
+  // --- Stats ---
   const [totalMessages, unreadCount, readCount, archivedCount] =
     await Promise.all([
       db.contactMessage.count(),

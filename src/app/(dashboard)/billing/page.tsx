@@ -218,7 +218,7 @@ export default async function BillingPage() {
                         </TableCell>
                         <TableCell className="text-center">
                           <Badge
-                            variant="success"
+                            variant="secondary"
                             className="bg-blue-50 text-blue-700 border-blue-200"
                           >
                             Enrolled

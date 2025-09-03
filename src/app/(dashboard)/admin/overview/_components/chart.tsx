@@ -13,8 +13,8 @@ import {
 
 interface ChartProps {
   data: { name: string; [key: string]: number | string }[];
-  dataKey: string; // e.g., "revenue" or "students"
-  color: string; // e.g., "#10b981"
+  dataKey: string;
+  color: string;
 }
 
 export const Chart = ({ data, dataKey, color }: ChartProps) => {

@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useTransition, useEffect } from "react"; // Import useEffect
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useTransition, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -47,14 +46,13 @@ const ContactPage = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "", // Start with empty defaults
+      name: "",
       email: "",
       subject: "",
       message: "",
     },
   });
 
-  // --- THIS IS THE KEY FIX ---
   // Use useEffect to update form values when the session loads.
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
@@ -66,14 +64,12 @@ const ContactPage = () => {
       });
     }
   }, [status, session, form]);
-  // The dependency array ensures this runs only when session status changes.
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     startTransition(async () => {
       try {
         const result = await submitContactMessage(values);
         toast.success(result.message);
-        // Reset only the fields the user types in, keeping their info
         form.reset({
           name: session?.user?.name || "",
           email: session?.user?.email || "",
@@ -106,9 +102,6 @@ const ContactPage = () => {
           </div>
         </div>
       </section>
-
-      {/* Contact Info Section (no changes needed) */}
-      <section className="py-12 bg-white">{/* ... */}</section>
 
       {/* Contact Form & FAQ Section */}
       <section className="py-16 bg-slate-50">
@@ -265,27 +258,6 @@ const ContactPage = () => {
                   </Button>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ✅ Map Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Find Us Here
-          </h2>
-          <div className="rounded-2xl overflow-hidden shadow-xl h-96 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-            <div className="text-center p-8">
-              <MapPin className="h-16 w-16 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                EduFlex Headquarters
-              </h3>
-              <p className="text-gray-700 mb-4">
-                123 Education Street, San Francisco, CA 94103
-              </p>
-              <p className="text-gray-600">Open in Google Maps</p>
             </div>
           </div>
         </div>

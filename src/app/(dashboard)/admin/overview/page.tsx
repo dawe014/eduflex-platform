@@ -59,7 +59,6 @@ export default async function AdminOverviewPage() {
     return redirect("/dashboard");
   }
 
-  // --- Fetch all necessary data in parallel for efficiency ---
   const [totalUsers, totalCourses, enrollments, newUsersThisMonth] =
     await Promise.all([
       db.user.count(),
@@ -79,7 +78,6 @@ export default async function AdminOverviewPage() {
   );
   const totalEnrollments = enrollments.length;
 
-  // --- Process data for the chart ---
   const chartData = groupDataByMonth(enrollments as any);
 
   return (
@@ -181,7 +179,6 @@ export default async function AdminOverviewPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* --- Correctly pass props to the Chart component --- */}
           <Chart data={chartData} dataKey="total" color="#10b981" />
         </CardContent>
       </Card>

@@ -19,7 +19,6 @@ export async function PATCH(req: Request) {
 
     const user = await db.user.findUnique({ where: { id: session.user.id } });
     if (!user || !user.hashedPassword) {
-      // This case handles users who signed up via OAuth
       return new NextResponse(
         "Password can only be changed for credential accounts",
         { status: 403 }
@@ -45,7 +44,6 @@ export async function PATCH(req: Request) {
 
     return new NextResponse("Password updated successfully", { status: 200 });
   } catch (error) {
-    console.log("[CHANGE_PASSWORD_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

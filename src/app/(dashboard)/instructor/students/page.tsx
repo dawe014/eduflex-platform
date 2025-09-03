@@ -14,7 +14,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Pagination } from "@/components/pagination"; // Reusing pagination component
+import { Pagination } from "@/components/pagination";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "./_components/search-input";
 
@@ -56,7 +56,7 @@ export default async function InstructorStudentsPage({
   const totalStudents = await db.enrollment.count({ where: whereClause });
   const pageCount = Math.ceil(totalStudents / STUDENTS_PER_PAGE);
 
-  // Fetch stats for all students (not just paginated)
+  // Fetch stats for all students
   const allEnrollments = await db.enrollment.findMany({
     where: { course: { instructorId: session.user.id } },
   });

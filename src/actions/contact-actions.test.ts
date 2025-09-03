@@ -55,11 +55,10 @@ describe("Contact Server Actions", () => {
       // Assert
       expect(result.success).toBe(true);
       expect(mockDbContactMessageCreate).toHaveBeenCalledTimes(1);
-      // --- CORRECTED ASSERTION ---
       expect(mockDbContactMessageCreate).toHaveBeenCalledWith({
         data: {
           ...validFormData,
-          userId: undefined, // Check for undefined, not null
+          userId: undefined, // Check for undefined
         },
       });
       expect(mockRevalidatePath).toHaveBeenCalledWith("/admin/messages");
@@ -96,9 +95,7 @@ describe("Contact Server Actions", () => {
     it("should throw an error if form data is invalid", async () => {
       // Arrange
       const invalidFormData = { ...validFormData, message: "Too short" };
-      // --- THIS IS THE FIX ---
-      // We must still mock a session, even though we're not testing auth here.
-      // This prevents the action from crashing before it gets to the validation step.
+
       const userSession = { user: { id: generateMongoId() } };
       mockGetServerSession.mockResolvedValue(userSession as any);
 

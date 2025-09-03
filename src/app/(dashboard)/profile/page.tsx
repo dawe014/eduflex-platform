@@ -14,8 +14,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ChangePasswordModal } from "@/components/auth/change-password-modal";
 import Link from "next/link";
-// Assuming Button component exists from the second snippet or is available
-import { Button } from "@/components/ui/button"; // Added for better button styling
+
+import { Button } from "@/components/ui/button";
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
@@ -23,13 +23,12 @@ export default async function ProfilePage() {
   const user = await db.user.findUnique({ where: { id: session.user.id } });
   if (!user) return redirect("/");
 
-  // Determine if user has a password (i.e., didn't sign up with OAuth)
   const hasPassword = !!user.hashedPassword;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8">
       <div className="container mx-auto p-4 md:p-6 space-y-8">
-        {/* Header - Enhanced Styling */}
+        {/* Header  */}
         <div className="flex flex-col md:flex-row items-center justify-between pb-6 border-b border-gray-200">
           <div className="text-center md:text-left">
             <h1 className="text-4xl font-extrabold text-gray-900 leading-tight flex items-center gap-3">
@@ -39,7 +38,6 @@ export default async function ProfilePage() {
               Manage your account settings and preferences.
             </p>
           </div>
-          {/* No additional buttons or content here, just styling existing structure */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -62,7 +60,7 @@ export default async function ProfilePage() {
 
           {/* Right Column: Security, Billing, Notifications Cards */}
           <div className="space-y-6">
-            {/* Security Card - Enhanced Styling */}
+            {/* Security Card */}
             <Card className="border-0 shadow-lg rounded-lg">
               <CardHeader className="pb-4 pt-5 px-6">
                 <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-800">
@@ -85,7 +83,7 @@ export default async function ProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Billing Card - Enhanced Styling */}
+            {/* Billing Card */}
             <Card className="border-0 shadow-lg rounded-lg">
               <CardHeader className="pb-4 pt-5 px-6">
                 <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-800">
@@ -102,27 +100,6 @@ export default async function ProfilePage() {
                   className="w-full justify-center py-2 text-lg font-medium bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 border-blue-200 border"
                 >
                   <Link href="/billing">View Purchase History</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Notifications Card - Enhanced Styling */}
-            <Card className="border-0 shadow-lg rounded-lg">
-              <CardHeader className="pb-4 pt-5 px-6">
-                <CardTitle className="flex items-center gap-2 text-xl font-semibold text-gray-800">
-                  <Bell className="h-6 w-6 text-amber-600" />
-                  Notifications
-                </CardTitle>
-                <CardDescription className="text-gray-500">
-                  Control how you receive alerts and updates.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="px-6 pb-6">
-                <Button
-                  asChild
-                  className="w-full justify-center py-2 text-lg font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-700 hover:text-indigo-800 border-indigo-200 border"
-                >
-                  <Link href="/settings">Manage Notifications</Link>
                 </Button>
               </CardContent>
             </Card>

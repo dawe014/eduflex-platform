@@ -119,7 +119,7 @@ describe("submitReview Server Action", () => {
     const userId = generateMongoId();
     const courseId = generateMongoId();
     const studentSession = { user: { id: userId, role: UserRole.STUDENT } };
-    const invalidReviewData = { rating: 0, comment: "This rating is invalid" }; // rating < 1
+    const invalidReviewData = { rating: 0, comment: "This rating is invalid" };
 
     mockGetServerSession.mockResolvedValue(studentSession);
 
@@ -128,7 +128,6 @@ describe("submitReview Server Action", () => {
       "Invalid review data."
     );
 
-    // Ensure no database calls were made because validation failed first
     expect(mockDbEnrollmentFindUnique).not.toHaveBeenCalled();
     expect(mockDbReviewUpsert).not.toHaveBeenCalled();
   });
