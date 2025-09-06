@@ -10,29 +10,26 @@ export type PlatformSettings = {
   allowCourseSubmissions: boolean;
 };
 
-/**
- * A server-side helper function to get the current platform settings.
- * It provides safe defaults if no settings are found in the database.
- */
 export async function getPlatformSettings(): Promise<PlatformSettings> {
   const settingsFromDb = await db.setting.findMany();
 
+  // Define the default state of your platform's settings
   const defaultSettings: PlatformSettings = {
     allowNewRegistrations: true,
     allowCourseSubmissions: true,
   };
 
-  const dbSettings = settingsFromDb.reduce((acc, setting) => {
-    acc[setting.key] = setting.value as any;
-    return acc;
-  }, {} as any);
+  const dbSettings = settingsFromDb.reduce(
+    (acc: Record<string, unknown>, setting) => {
+      acc[setting.key] = setting.value;
+      return acc;
+    },
+    {}
+  );
 
   return { ...defaultSettings, ...dbSettings };
 }
 
-/**
- * An admin-only server action to update platform settings.
- */
 export async function updatePlatformSettings(
   settings: Partial<PlatformSettings>
 ) {
