@@ -25,9 +25,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         const user = await db.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
+          where: { email: credentials.email },
         });
 
         if (!user || !user?.hashedPassword) {
@@ -60,8 +58,8 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
       }
 
-      if (trigger === "update" && (session as any)?.role) {
-        token.role = (session as any).role;
+      if (trigger === "update" && session?.role) {
+        token.role = session.role;
       }
 
       return token;
