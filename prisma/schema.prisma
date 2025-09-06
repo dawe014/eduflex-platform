@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,7 +11,8 @@ datasource db {
 enum UserRole {
   STUDENT
   INSTRUCTOR
-  ADMIN // Added for future scalability
+  ADMIN 
+  NEW_USER 
 }
 
 // User model for authentication and roles
@@ -25,16 +23,20 @@ model User {
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
-  role           UserRole  @default(STUDENT)
-  bio            String? // Added for instructor profiles
+  role           UserRole  @default(NEW_USER )
+  bio            String? 
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  contactMessages ContactMessage[]
+
 
   // Relationships
   courses     Course[]     @relation("CourseInstructor")
   enrollments Enrollment[]
   reviews     Review[]
   wishlist Wishlist[]
+  notifications    Json?
 
   // NextAuth specific models
   accounts Account[]
@@ -95,11 +97,15 @@ model Course {
   chapters     Chapter[]
   enrollments  Enrollment[]
   reviews      Review[]
-    wishlist Wishlist[]
+  wishlist Wishlist[]
+
+  learnings       String[]
+  requirements    String[] 
+  includes        String[] 
 
 }
 
-// Chapter model - NEW!
+// Chapter model
 model Chapter {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
@@ -118,7 +124,7 @@ model Chapter {
   updatedAt   DateTime @updatedAt
 }
 
-// Lesson model - Updated to belong to a Chapter
+// Lesson model
 model Lesson {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
@@ -127,7 +133,7 @@ model Lesson {
   position    Int
   isPublished Boolean  @default(false)
   isFree      Boolean  @default(false)
-
+  duration    String?
 
   chapterId   String   @db.ObjectId
   chapter     Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
@@ -152,7 +158,7 @@ model Enrollment {
   @@unique([userId, courseId])
 }
 
-// UserProgress model - Updated for clarity
+// UserProgress model 
 model UserProgress {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   isCompleted Boolean  @default(false)
@@ -179,6 +185,9 @@ model Review {
   courseId  String   @db.ObjectId
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
+  isReported      Boolean @default(false) 
+  reportReason    String? 
+
   @@unique([userId, courseId])
 }
 
@@ -191,5 +200,30 @@ model Wishlist {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, courseId]) // A user can only wishlist a course once
+  @@unique([userId, courseId]) 
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+model ContactMessage {
+  id        String        @id @default(auto()) @map("_id") @db.ObjectId
+  name      String        
+  email     String        
+  subject   String
+  message   String
+  status    MessageStatus @default(UNREAD)
+  createdAt DateTime      @default(now())
+
+  userId    String?       @db.ObjectId
+  user      User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model Setting {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  key   String @unique 
+  value Json  
 }

@@ -1,4 +1,3 @@
-// File: src/app/(dashboard)/instructor/dashboard/page.tsx
 import { StatCard } from "@/components/instructor/stat-card";
 import { Button } from "@/components/ui/button";
 import { authOptions } from "@/lib/auth";
@@ -14,13 +13,11 @@ export default async function InstructorDashboard() {
     return redirect("/");
   }
 
-  // Fetch all courses created by this instructor
   const courses = await db.course.findMany({
     where: {
       instructorId: session.user.id,
     },
     include: {
-      // Include enrollments to calculate revenue and student count
       enrollments: true,
     },
     orderBy: {
@@ -28,7 +25,6 @@ export default async function InstructorDashboard() {
     },
   });
 
-  // Calculate total revenue and total students
   const totalRevenue = courses.reduce((acc, course) => {
     const courseRevenue = (course.price || 0) * course.enrollments.length;
     return acc + courseRevenue;
@@ -75,7 +71,6 @@ export default async function InstructorDashboard() {
               <span className="text-sm text-muted-foreground">
                 {course.enrollments.length} Student(s)
               </span>
-              {/* TODO: Add link to edit course page */}
               <Button variant="outline" size="sm">
                 <Link href={`/instructor/courses/${course.id}`}>Edit</Link>
               </Button>

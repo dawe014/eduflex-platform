@@ -38,7 +38,9 @@ export function UserButton() {
             href={
               session?.user?.role === "INSTRUCTOR"
                 ? "/instructor/dashboard"
-                : "/dashboard" // Directs students to their dashboard
+                : session?.user?.role === "ADMIN"
+                ? "/admin/overview"
+                : "/dashboard"
             }
           >
             Dashboard

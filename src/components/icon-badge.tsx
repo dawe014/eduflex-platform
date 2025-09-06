@@ -1,4 +1,3 @@
-// File: src/components/icon-badge.tsx
 import { cva, type VariantProps } from "class-variance-authority";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,6 +9,8 @@ const backgroundVariants = cva(
       variant: {
         default: "bg-sky-100",
         success: "bg-emerald-100",
+        warning: "bg-amber-100",
+        primary: "bg-blue-100",
       },
       size: {
         default: "p-2",
@@ -28,6 +29,8 @@ const iconVariants = cva("", {
     variant: {
       default: "text-sky-700",
       success: "text-emerald-700",
+      warning: "text-amber-700",
+      primary: "text-blue-700",
     },
     size: {
       default: "h-8 w-8",

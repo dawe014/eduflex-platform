@@ -8,6 +8,7 @@ export async function PUT(
   { params }: { params: { courseId: string; chapterId: string } }
 ) {
   try {
+    const { courseId, chapterId } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user || session.user.role !== "INSTRUCTOR") {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -17,8 +18,8 @@ export async function PUT(
 
     const chapterOwner = await db.chapter.findUnique({
       where: {
-        id: params.chapterId,
-        courseId: params.courseId,
+        id: chapterId,
+        courseId: courseId,
         course: { instructorId: session.user.id },
       },
     });
@@ -28,7 +29,7 @@ export async function PUT(
 
     const transaction = list.map((item: { id: string; position: number }) =>
       db.lesson.update({
-        where: { id: item.id, chapterId: params.chapterId },
+        where: { id: item.id, chapterId: chapterId },
         data: { position: item.position },
       })
     );
@@ -37,7 +38,8 @@ export async function PUT(
 
     return new NextResponse("Success", { status: 200 });
   } catch (error) {
-    console.log("[LESSONS_REORDER]", error);
+    console.error("[LESSON_REORDER]", error);
+
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

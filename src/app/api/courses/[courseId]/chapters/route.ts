@@ -10,7 +10,7 @@ export async function POST(
   try {
     const session = await getServerSession(authOptions);
     const { title } = await req.json();
-    const { courseId } = params;
+    const { courseId } = await params;
 
     if (!session?.user || session.user.role !== "INSTRUCTOR") {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -40,7 +40,7 @@ export async function POST(
 
     return NextResponse.json(chapter);
   } catch (error) {
-    console.log("[CHAPTERS_POST]", error);
+    console.error("[CHAPTER_CREATE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

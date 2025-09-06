@@ -1,4 +1,3 @@
-// File: src/app/(dashboard)/_components/sidebar-routes.tsx
 "use client";
 
 import {
@@ -10,30 +9,41 @@ import {
   User,
   Users,
   Video,
+  Home,
+  CreditCard,
+  MessageSquare,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
 import { SidebarItem } from "./sidebar-item";
-import { useSession, signOut } from "next-auth/react"; // Import useSession and signOut
+import { useSession, signOut } from "next-auth/react";
 
 export const SidebarRoutes = () => {
-  const pathname = usePathname();
-  const { data: session } = useSession(); // Get session data to check the role
+  const { data: session } = useSession();
 
   const studentRoutes = [
     {
+      icon: Home,
+      label: "Dashboard",
+      href: "/dashboard",
+    },
+    {
       icon: BookOpen,
       label: "My Learning",
-      href: "/dashboard",
+      href: "/learning",
     },
     {
       icon: Heart,
       label: "Wishlist",
-      href: "/wishlist", // New page
+      href: "/wishlist",
+    },
+    {
+      icon: CreditCard,
+      label: "Billing",
+      href: "/billing",
     },
     {
       icon: User,
       label: "Profile",
-      href: "/profile", // New page
+      href: "/profile",
     },
   ];
 
@@ -41,17 +51,27 @@ export const SidebarRoutes = () => {
     {
       icon: Video,
       label: "My Courses",
-      href: "/instructor/dashboard",
+      href: "/instructor/courses",
     },
     {
       icon: BarChart,
+      label: "Analytics",
+      href: "/instructor/analytics",
+    },
+    {
+      icon: CreditCard,
       label: "Earnings",
-      href: "/instructor/earnings", // New page
+      href: "/instructor/earnings",
+    },
+    {
+      icon: Users,
+      label: "Students",
+      href: "/instructor/students",
     },
     {
       icon: User,
       label: "Profile",
-      href: "/profile", // Shared page
+      href: "/profile",
     },
   ];
 
@@ -59,41 +79,47 @@ export const SidebarRoutes = () => {
     {
       icon: BarChart,
       label: "Overview",
-      href: "/admin/overview", // New page
+      href: "/admin/overview",
     },
     {
       icon: Users,
-      label: "Manage Users",
-      href: "/admin/users", // New page
+      label: "Users",
+      href: "/admin/users",
     },
     {
       icon: Video,
-      label: "Manage Courses",
-      href: "/admin/courses", // New page
+      label: "Courses",
+      href: "/admin/courses",
     },
     {
+      icon: MessageSquare,
+      label: "Messages",
+      href: "/admin/messages",
+    },
+
+    {
       icon: Settings,
-      label: "Settings",
-      href: "/admin/settings", // New page
+      label: "Platform Settings",
+      href: "/admin/settings",
+    },
+    {
+      icon: User,
+      label: "Profile",
+      href: "/profile",
     },
   ];
 
-  // Determine which set of routes to display
-  let routes;
+  let routes = studentRoutes; // Default to student
+
   if (session?.user?.role === "INSTRUCTOR") {
     routes = instructorRoutes;
   } else if (session?.user?.role === "ADMIN") {
-    // We haven't added ADMIN to the schema yet, but this is how it would work
     routes = adminRoutes;
-  } else {
-    // Default to student routes
-    routes = studentRoutes;
   }
 
   return (
     <div className="flex flex-col h-full">
-      {/* Main navigation links */}
-      <div className="flex flex-col w-full flex-1">
+      <div className="flex flex-col w-full flex-1 space-y-1 p-2">
         {routes.map((route) => (
           <SidebarItem
             key={route.href}
@@ -104,17 +130,14 @@ export const SidebarRoutes = () => {
         ))}
       </div>
 
-      {/* Logout button at the bottom */}
-      <div className="mt-auto p-4">
+      <div className="p-4 border-t border-gray-200 mt-auto">
         <button
-          onClick={() => signOut({ callbackUrl: "/" })} // Sign out and redirect to homepage
+          onClick={() => signOut({ callbackUrl: "/" })}
           type="button"
-          className="flex items-center gap-x-2 text-slate-500 text-sm font-[500] pl-6 transition-all hover:text-red-500 w-full"
+          className="flex items-center gap-x-3 text-gray-600 text-sm font-medium p-3 transition-all hover:bg-red-50 hover:text-red-700 rounded-lg w-full"
         >
-          <div className="flex items-center gap-x-2 py-4">
-            <LogOut size={22} />
-            Logout
-          </div>
+          <LogOut size={20} />
+          <span>Logout</span>
         </button>
       </div>
     </div>

@@ -6,10 +6,13 @@ import { NextResponse } from "next/server";
 export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user)
+    if (!session?.user) {
       return new NextResponse("Unauthorized", { status: 401 });
+    }
 
     const values = await req.json();
+
+    // Validate input here if necessary
 
     const updatedUser = await db.user.update({
       where: { id: session.user.id },
@@ -21,7 +24,7 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json(updatedUser);
   } catch (error) {
-    console.log("[PROFILE_PATCH]", error);
+    console.error("[PROFILE_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

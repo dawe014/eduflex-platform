@@ -1,4 +1,3 @@
-// File: src/app/api/courses/[courseId]/lessons/route.ts
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
@@ -11,7 +10,7 @@ export async function POST(
   try {
     const session = await getServerSession(authOptions);
     const { title } = await req.json();
-    const { courseId } = await params; // Get courseId from params for clarity
+    const { courseId } = await params;
 
     if (!session?.user || session.user.role !== "INSTRUCTOR") {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -25,15 +24,13 @@ export async function POST(
       return new NextResponse("Forbidden", { status: 403 });
     }
 
-    // --- START OF NEW LOGIC ---
-
     // 1. Find the last lesson to determine the new position
     const lastLesson = await db.lesson.findFirst({
       where: {
         courseId: courseId,
       },
       orderBy: {
-        position: "desc", // Order by position descending to get the highest one
+        position: "desc",
       },
     });
 
@@ -42,19 +39,17 @@ export async function POST(
     // If there are no lessons yet, the new position is 1.
     const newPosition = lastLesson ? lastLesson.position + 1 : 1;
 
-    // --- END OF NEW LOGIC ---
-
     const lesson = await db.lesson.create({
       data: {
         title,
         courseId: courseId,
-        position: newPosition, // 3. Provide the calculated position
+        position: newPosition,
       },
     });
 
     return NextResponse.json(lesson);
   } catch (error) {
-    console.log("[LESSONS]", error);
+    console.error("[LESSON_CREATE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

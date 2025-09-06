@@ -1,144 +1,99 @@
-// File: src/app/(marketing)/page.tsx
-
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { db } from "@/lib/db";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 import {
   CheckCircle,
   ShieldCheck,
   Users,
   Star,
   ArrowRight,
-  Play,
   Award,
   BookOpen,
   Clock,
   Globe,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { CourseCard } from "@/components/courses/course-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HeroSlider } from "@/components/layout/hero-slider";
 
-// This is a Server Component, so we can fetch data directly
 export default async function HomePage() {
-  // Fetch a few featured courses to display on the homepage
+  const session = await getServerSession(authOptions);
+
+  // --- 1. Fetch Featured Courses ---
   const featuredCourses = await db.course.findMany({
-    where: {
-      isPublished: true,
+    where: { isPublished: true },
+    include: {
+      category: true,
+      reviews: true,
+      enrollments: true,
+      chapters: {
+        where: { isPublished: true },
+        include: {
+          lessons: {
+            where: { isPublished: true },
+          },
+        },
+      },
     },
     take: 3,
     orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      category: true,
+      enrollments: { _count: "desc" },
     },
   });
 
+  const userWishlist = session?.user
+    ? await db.wishlist.findMany({
+        where: { userId: session.user.id },
+        select: { courseId: true },
+      })
+    : [];
+  const wishlistedCourseIds = new Set(
+    userWishlist.map((item) => item.courseId)
+  );
+
+  // --- 3. Fetch Platform Stats ---
+  const [totalCourses, totalEnrollments] = await Promise.all([
+    db.course.count({ where: { isPublished: true } }),
+    db.enrollment.count(),
+  ]);
+
   return (
     <div className="bg-gradient-to-b from-slate-50 to-gray-100">
-      {/* 1. Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 z-0"></div>
-        <div className="container mx-auto px-4 py-20 md:py-32 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
-            <div className="lg:w-1/2 text-center lg:text-left">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                Unlock Your{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                  Potential
-                </span>{" "}
-                with EduFlex
-              </h1>
-              <p className="mt-6 text-xl text-gray-700 max-w-2xl">
-                Discover a world of knowledge with our expert-led online
-                courses. Learn at your own pace, anytime, anywhere.
-              </p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button
-                  size="lg"
-                  className="px-8 py-3 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg"
-                  asChild
-                >
-                  <Link href="/courses">
-                    Explore Courses <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="px-8 py-3 text-lg border-2"
-                  asChild
-                >
-                  <Link href="/instructor/dashboard">Become an Instructor</Link>
-                </Button>
-              </div>
-              <div className="mt-12 flex flex-wrap gap-8 justify-center lg:justify-start">
-                <div className="flex items-center">
-                  <Users className="h-6 w-6 text-blue-600 mr-2" />
-                  <span className="text-gray-700 font-medium">
-                    50,000+ Students
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <Award className="h-6 w-6 text-purple-600 mr-2" />
-                  <span className="text-gray-700 font-medium">
-                    Expert Instructors
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <BookOpen className="h-6 w-6 text-green-600 mr-2" />
-                  <span className="text-gray-700 font-medium">
-                    1,000+ Courses
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="lg:w-1/2 mt-12 lg:mt-0">
-              <div className="relative">
-                <div className="bg-white rounded-2xl p-2 shadow-2xl">
-                  <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center">
-                    <div className="bg-white p-6 rounded-full shadow-lg">
-                      <Play className="h-12 w-12 text-blue-600 fill-current" />
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg">
-                  <div className="flex items-center">
-                    <div className="bg-green-100 p-2 rounded-full mr-3">
-                      <CheckCircle className="h-6 w-6 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">Interactive Learning</p>
-                      <p className="text-sm text-gray-600">Hands-on projects</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute -top-6 -right-6 bg-white p-4 rounded-xl shadow-lg">
-                  <div className="flex items-center">
-                    <div className="bg-blue-100 p-2 rounded-full mr-3">
-                      <Clock className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">Self-Paced</p>
-                      <p className="text-sm text-gray-600">
-                        Learn on your schedule
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* 1. Hero Section with Slider */}
+      <HeroSlider />
+
+      {/* Hero Stats */}
+      <div className="relative z-10 -mt-16 md:-mt-20 container mx-auto px-4">
+        <div className="bg-white rounded-2xl p-6 shadow-2xl grid grid-cols-2 md:grid-cols-4 gap-4 text-center border">
+          <div className="flex flex-col items-center gap-2">
+            <BookOpen className="h-8 w-8 text-blue-600" />
+            <p className="font-bold text-xl">
+              {totalCourses.toLocaleString()}+
+            </p>
+            <p className="text-sm text-gray-500">Online Courses</p>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Award className="h-8 w-8 text-purple-600" />
+            <p className="font-bold text-xl">Expert</p>
+            <p className="text-sm text-gray-500">Instructors</p>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Users className="h-8 w-8 text-green-600" />
+            <p className="font-bold text-xl">
+              {totalEnrollments.toLocaleString()}+
+            </p>
+            <p className="text-sm text-gray-500">Happy Students</p>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Clock className="h-8 w-8 text-orange-600" />
+            <p className="font-bold text-xl">Lifetime</p>
+            <p className="text-sm text-gray-500">Access</p>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* 2. Featured Courses Section */}
       <section className="py-20">
@@ -160,11 +115,8 @@ export default async function HomePage() {
               {featuredCourses.map((course) => (
                 <CourseCard
                   key={course.id}
-                  id={course.id}
-                  title={course.title}
-                  imageUrl={course.imageUrl}
-                  category={course.category?.name}
-                  price={course.price}
+                  course={course}
+                  isWishlisted={wishlistedCourseIds.has(course.id)}
                 />
               ))}
             </div>
@@ -192,7 +144,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 3. "Why Choose Us?" Section */}
+      {/* 3. Why Choose Us Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -204,11 +156,9 @@ export default async function HomePage() {
               ?
             </h2>
             <p className="text-xl text-gray-700">
-              We're committed to providing the best learning experience for our
-              students
+              We&apos;re committed to providing the best learning experience
             </p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center p-6 bg-slate-50 rounded-2xl hover:shadow-lg transition-all duration-300">
               <div className="bg-blue-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
@@ -216,22 +166,18 @@ export default async function HomePage() {
               </div>
               <h3 className="text-xl font-semibold mb-3">Expert Instructors</h3>
               <p className="text-gray-600">
-                Learn from industry professionals who bring real-world
-                experience to every course.
+                Learn from professionals who bring real-world experience.
               </p>
             </div>
-
             <div className="text-center p-6 bg-slate-50 rounded-2xl hover:shadow-lg transition-all duration-300">
               <div className="bg-purple-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Users className="h-8 w-8 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold mb-3">Flexible Learning</h3>
               <p className="text-gray-600">
-                Access courses on any device and learn at a pace that works for
-                you.
+                Access courses on any device and learn at your own pace.
               </p>
             </div>
-
             <div className="text-center p-6 bg-slate-50 rounded-2xl hover:shadow-lg transition-all duration-300">
               <div className="bg-green-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <ShieldCheck className="h-8 w-8 text-green-600" />
@@ -241,7 +187,6 @@ export default async function HomePage() {
                 Enroll once and have unlimited access to your courses forever.
               </p>
             </div>
-
             <div className="text-center p-6 bg-slate-50 rounded-2xl hover:shadow-lg transition-all duration-300">
               <div className="bg-amber-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Globe className="h-8 w-8 text-amber-600" />
@@ -268,7 +213,7 @@ export default async function HomePage() {
               Say
             </h2>
             <p className="text-xl text-gray-700">
-              Don't just take our word for it - hear from our community
+              Don&apos;t just take our word for it - hear from our community
             </p>
           </div>
 

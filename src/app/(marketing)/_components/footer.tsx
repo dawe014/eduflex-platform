@@ -1,4 +1,3 @@
-// File: src/app/(marketing)/_components/footer.tsx
 import Link from "next/link";
 import { Logo } from "./logo";
 import {
@@ -86,7 +85,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/become-instructor"
+                  href="/#"
                   className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group"
                 >
                   <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:mr-3 transition-all duration-300"></span>
@@ -95,7 +94,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/blog"
+                  href="/#"
                   className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group"
                 >
                   <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:mr-3 transition-all duration-300"></span>
@@ -104,7 +103,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/success-stories"
+                  href="/#"
                   className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group"
                 >
                   <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:mr-3 transition-all duration-300"></span>
@@ -113,7 +112,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/faq"
+                  href="/#"
                   className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group"
                 >
                   <span className="w-1 h-1 bg-blue-500 rounded-full mr-2 group-hover:mr-3 transition-all duration-300"></span>
@@ -141,7 +140,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/help-center"
+                  href="/#"
                   className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group"
                 >
                   <span className="w-1 h-1 bg-purple-500 rounded-full mr-2 group-hover:mr-3 transition-all duration-300"></span>
@@ -150,7 +149,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/privacy"
+                  href="/#"
                   className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group"
                 >
                   <span className="w-1 h-1 bg-purple-500 rounded-full mr-2 group-hover:mr-3 transition-all duration-300"></span>
@@ -159,7 +158,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/terms"
+                  href="/#"
                   className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group"
                 >
                   <span className="w-1 h-1 bg-purple-500 rounded-full mr-2 group-hover:mr-3 transition-all duration-300"></span>
@@ -168,7 +167,7 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/refund-policy"
+                  href="/#"
                   className="text-gray-400 hover:text-white transition-colors duration-300 flex items-center group"
                 >
                   <span className="w-1 h-1 bg-purple-500 rounded-full mr-2 group-hover:mr-3 transition-all duration-300"></span>
@@ -187,11 +186,11 @@ export const Footer = () => {
             <ul className="space-y-4 mb-8">
               <li className="flex items-start">
                 <Mail className="h-5 w-5 text-green-400 mt-0.5 mr-3 flex-shrink-0" />
-                <span className="text-gray-400">support@eduflex.com</span>
+                <span className="text-gray-400">dawittamiru014@gmail.com</span>
               </li>
               <li className="flex items-start">
                 <Phone className="h-5 w-5 text-green-400 mt-0.5 mr-3 flex-shrink-0" />
-                <span className="text-gray-400">+1 (555) 123-4567</span>
+                <span className="text-gray-400">+251 (918) 344-686</span>
               </li>
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 text-green-400 mt-0.5 mr-3 flex-shrink-0" />
@@ -235,13 +234,13 @@ export const Footer = () => {
           </div>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link
-              href="/sitemap"
+              href="/#"
               className="text-gray-500 hover:text-white text-sm transition-colors duration-300"
             >
               Sitemap
             </Link>
             <Link
-              href="/accessibility"
+              href="/#"
               className="text-gray-500 hover:text-white text-sm transition-colors duration-300"
             >
               Accessibility

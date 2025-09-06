@@ -1,8 +1,10 @@
-// File: src/components/courses/reviews.tsx
+"use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { useSession } from "next-auth/react";
 
+// Define a more complete type for reviews with user info
 type ReviewWithUser = {
   id: string;
   rating: number;
@@ -30,54 +32,60 @@ export const Reviews = ({ reviews }: ReviewsProps) => {
       <CardContent className="p-6">
         <h2 className="text-2xl font-bold mb-6">Student Reviews</h2>
 
-        {/* Rating Summary */}
-        <div className="flex items-center gap-6 mb-8 p-6 bg-gray-50 rounded-lg">
-          <div className="text-center">
-            <div className="text-4xl font-bold text-gray-900">
-              {avgRating.toFixed(1)}
+        {/* Rating Summary Section */}
+        {totalReviews > 0 && (
+          <div className="flex flex-col md:flex-row items-start gap-6 mb-8 p-6 bg-gray-50 rounded-lg">
+            <div className="text-center w-full md:w-auto">
+              <div className="text-4xl font-bold text-gray-900">
+                {avgRating.toFixed(1)}
+              </div>
+              <div className="flex justify-center mt-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-5 w-5 ${
+                      i < Math.round(avgRating)
+                        ? "text-amber-400 fill-amber-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+              <div className="text-sm text-gray-600 mt-1">
+                {totalReviews} {totalReviews === 1 ? "review" : "reviews"}
+              </div>
             </div>
-            <div className="flex justify-center mt-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-5 w-5 ${
-                    i < Math.floor(avgRating)
-                      ? "text-amber-400 fill-amber-400"
-                      : "text-gray-300"
-                  }`}
-                />
-              ))}
-            </div>
-            <div className="text-sm text-gray-600 mt-1">
-              {totalReviews} reviews
-            </div>
-          </div>
 
-          <div className="flex-1 space-y-2">
-            {[5, 4, 3, 2, 1].map((stars) => {
-              const count = reviews.filter(
-                (r) => Math.round(r.rating) === stars
-              ).length;
-              const percentage =
-                totalReviews > 0 ? (count / totalReviews) * 100 : 0;
+            <div className="flex-1 w-full space-y-2">
+              {[5, 4, 3, 2, 1].map((stars) => {
+                const count = reviews.filter(
+                  (r) => Math.round(r.rating) === stars
+                ).length;
+                const percentage =
+                  totalReviews > 0 ? (count / totalReviews) * 100 : 0;
 
-              return (
-                <div key={stars} className="flex items-center gap-3">
-                  <div className="w-8 text-sm text-gray-600">{stars}</div>
-                  <div className="flex-1 bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-amber-400 h-2 rounded-full"
-                      style={{ width: `${percentage}%` }}
-                    />
+                return (
+                  <div key={stars} className="flex items-center gap-3">
+                    <div className="w-16 text-sm text-gray-600 flex items-center gap-1">
+                      {stars} <Star className="h-4 w-4 text-gray-400" />
+                    </div>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-amber-400 h-2 rounded-full"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <div className="w-8 text-sm text-gray-600 text-right">
+                      {count}
+                    </div>
                   </div>
-                  <div className="w-8 text-sm text-gray-600">{count}</div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Reviews List */}
+        {/* Individual Reviews List */}
         <div className="space-y-6">
           {reviews.map((review) => (
             <div
@@ -87,31 +95,35 @@ export const Reviews = ({ reviews }: ReviewsProps) => {
               <Avatar className="h-12 w-12">
                 <AvatarImage src={review.user.image || ""} />
                 <AvatarFallback className="bg-blue-100 text-blue-800">
-                  {review.user.name?.charAt(0) || "U"}
+                  {review.user.name?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <p className="font-semibold">
-                    {review.user.name || "Anonymous"}
-                  </p>
-                  <span className="text-sm text-gray-500">
-                    {new Date(review.createdAt).toLocaleDateString()}
-                  </span>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold">
+                      {review.user.name || "Anonymous"}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${
+                              i < review.rating
+                                ? "text-amber-400 fill-amber-400"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-gray-500">
+                        • {new Date(review.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-4 w-4 ${
-                        i < review.rating
-                          ? "text-amber-400 fill-amber-400"
-                          : "text-gray-300"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <p className="text-gray-700">{review.comment}</p>
+                <p className="text-gray-700 mt-3">{review.comment}</p>
               </div>
             </div>
           ))}

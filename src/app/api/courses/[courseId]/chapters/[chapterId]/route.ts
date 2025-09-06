@@ -3,7 +3,6 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-// Generic PATCH for updating chapter details
 export async function PATCH(
   req: Request,
   { params }: { params: { courseId: string; chapterId: string } }
@@ -30,7 +29,7 @@ export async function PATCH(
 
     return NextResponse.json(chapter);
   } catch (error) {
-    console.log("[COURSE_CHAPTER_PATCH]", error);
+    console.error("[CHAPTER_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -41,7 +40,6 @@ export async function DELETE(
   { params }: { params: { courseId: string; chapterId: string } }
 ) {
   const session = await getServerSession(authOptions);
-  const values = await req.json();
   const { courseId, chapterId } = await params;
 
   if (!session?.user || session.user.role !== "INSTRUCTOR") {

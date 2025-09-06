@@ -9,8 +9,10 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import { cn } from "@/lib/utils";
-import { Grip, Pencil } from "lucide-react";
+import { Grip, Pencil, BookOpen, Eye, EyeOff, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface ChaptersListProps {
   items: Chapter[];
@@ -26,13 +28,10 @@ export const ChaptersList = ({
   const [isMounted, setIsMounted] = useState(false);
   const [chapters, setChapters] = useState(items);
 
-  // This effect ensures the component only renders on the client,
-  // preventing hydration errors common with drag-and-drop libraries.
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // This effect syncs the component's state with props if the props change.
   useEffect(() => {
     setChapters(items);
   }, [items]);
@@ -40,21 +39,17 @@ export const ChaptersList = ({
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
-    // Create a new, reordered array in memory
     const items = Array.from(chapters);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
-    // Update the UI optimistically
     setChapters(items);
 
-    // Prepare the data for the API call
     const bulkUpdateData = items.map((chapter, index) => ({
       id: chapter.id,
-      position: index + 1, // Recalculate position based on new order
+      position: index + 1,
     }));
 
-    // Call the parent function to trigger the API update
     onReorder(bulkUpdateData);
   };
 
@@ -65,51 +60,101 @@ export const ChaptersList = ({
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="chapters">
-        {(provided) => (
-          <div {...provided.droppableProps} ref={provided.innerRef}>
+        {(provided, snapshot) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className={cn(
+              "space-y-3",
+              snapshot.isDraggingOver && "bg-blue-50 rounded-lg p-2"
+            )}
+          >
             {chapters.map((chapter, index) => (
               <Draggable
                 key={chapter.id}
                 draggableId={chapter.id}
                 index={index}
               >
-                {(provided) => (
-                  <div
+                {(provided, snapshot) => (
+                  <Card
                     className={cn(
-                      "flex items-center gap-x-2 bg-slate-200 border-slate-200 border text-slate-700 rounded-md mb-4 text-sm",
-                      chapter.isPublished &&
-                        "bg-sky-100 border-sky-200 text-sky-700"
+                      "border-0 transition-all duration-200",
+                      snapshot.isDragging && "shadow-lg ring-2 ring-blue-500",
+                      chapter.isPublished
+                        ? "bg-gradient-to-r from-blue-50 to-sky-50 border-blue-200"
+                        : "bg-gray-50 border-gray-200"
                     )}
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                   >
-                    <div
-                      className={cn(
-                        "px-2 py-3 border-r border-r-slate-200 hover:bg-slate-300 rounded-l-md transition",
-                        chapter.isPublished &&
-                          "border-r-sky-200 hover:bg-sky-200"
-                      )}
-                      {...provided.dragHandleProps} // Apply the drag handle here
-                    >
-                      <Grip className="h-5 w-5" />
-                    </div>
-                    {chapter.title}
-                    <div className="ml-auto pr-2 flex items-center gap-x-2">
-                      {chapter.isFree && <Badge>Free</Badge>}
-                      <Badge
-                        className={cn(
-                          "bg-slate-500",
-                          chapter.isPublished && "bg-sky-700"
-                        )}
-                      >
-                        {chapter.isPublished ? "Published" : "Draft"}
-                      </Badge>
-                      <Pencil
-                        onClick={() => onEdit(chapter.id)}
-                        className="w-4 h-4 cursor-pointer hover:opacity-75 transition"
-                      />
-                    </div>
-                  </div>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={cn(
+                            "p-2 rounded-lg cursor-grab active:cursor-grabbing transition-colors",
+                            chapter.isPublished
+                              ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                          )}
+                          {...provided.dragHandleProps}
+                        >
+                          <Grip className="h-4 w-4" />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 truncate">
+                            {chapter.title || "Untitled Chapter"}
+                          </h4>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-xs text-gray-500">
+                              Position {chapter.position}
+                            </span>
+                            <BookOpen className="h-3 w-3 text-gray-400" />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {chapter.isFree && (
+                            <Badge
+                              variant="outline"
+                              className="bg-amber-50 text-amber-700 border-amber-200"
+                            >
+                              <Crown className="h-3 w-3 mr-1" />
+                              Free
+                            </Badge>
+                          )}
+
+                          <Badge
+                            variant={
+                              chapter.isPublished ? "default" : "secondary"
+                            }
+                            className={cn(
+                              "px-2 py-1 text-xs",
+                              chapter.isPublished
+                                ? "bg-green-100 text-green-800 hover:bg-green-100"
+                                : "bg-gray-100 text-gray-800 hover:bg-gray-100"
+                            )}
+                          >
+                            {chapter.isPublished ? (
+                              <Eye className="h-3 w-3 mr-1" />
+                            ) : (
+                              <EyeOff className="h-3 w-3 mr-1" />
+                            )}
+                            {chapter.isPublished ? "Published" : "Draft"}
+                          </Badge>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onEdit(chapter.id)}
+                            className="h-8 w-8 text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 )}
               </Draggable>
             ))}

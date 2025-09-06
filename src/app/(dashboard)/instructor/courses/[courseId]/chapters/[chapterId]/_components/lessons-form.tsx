@@ -1,4 +1,3 @@
-// File: src/app/(dashboard)/instructor/courses/[courseId]/chapters/[chapterId]/_components/lessons-form.tsx
 "use client";
 
 import * as z from "zod";
@@ -13,13 +12,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Loader2, PlusCircle } from "lucide-react";
+import { Loader2, PlusCircle, Video, BookOpen, Grip } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Chapter, Lesson } from "@prisma/client";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { LessonsList } from "./lessons-list"; // We will create this
+import { LessonsList } from "./lessons-list";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface LessonsFormProps {
   initialData: Chapter & { lessons: Lesson[] };
@@ -51,12 +50,12 @@ export const LessonsForm = ({
         method: "POST",
         body: JSON.stringify(values),
       });
-      toast.success("Lesson created");
+      toast.success("Lesson created successfully");
       toggleCreating();
       form.reset();
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Failed to create lesson");
     }
   };
 
@@ -73,7 +72,7 @@ export const LessonsForm = ({
       toast.success("Lessons reordered");
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Failed to reorder lessons");
     } finally {
       setIsUpdating(false);
     }
@@ -84,73 +83,123 @@ export const LessonsForm = ({
   };
 
   return (
-    <div className="relative mt-6 border bg-slate-100 rounded-md p-4">
+    <Card className="border-0 shadow-lg relative">
       {isUpdating && (
-        <div className="absolute h-full w-full bg-slate-500/20 top-0 right-0 rounded-m flex items-center justify-center">
-          <Loader2 className="animate-spin h-6 w-6 text-sky-700" />
+        <div className="absolute inset-0 bg-white/80 rounded-lg flex items-center justify-center z-10">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-2" />
+            <p className="text-sm text-gray-600">Updating order...</p>
+          </div>
         </div>
       )}
-      <div className="font-medium flex items-center justify-between">
-        Chapter lessons
-        <Button onClick={toggleCreating} variant="ghost">
+
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-purple-100 rounded-lg">
+            <Video className="h-5 w-5 text-purple-600" />
+          </div>
+          <div>
+            <CardTitle className="text-lg font-semibold">
+              Chapter Lessons
+            </CardTitle>
+            <p className="text-sm text-gray-600">
+              {initialData.lessons.length} lesson
+              {initialData.lessons.length !== 1 ? "s" : ""}
+            </p>
+          </div>
+        </div>
+        <Button
+          onClick={toggleCreating}
+          variant={isCreating ? "outline" : "default"}
+          className="gap-2"
+        >
           {isCreating ? (
             "Cancel"
           ) : (
             <>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add a lesson
+              <PlusCircle className="h-4 w-4" />
+              Add Lesson
             </>
           )}
         </Button>
-      </div>
-      {isCreating && (
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 mt-4"
-          >
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      disabled={isSubmitting}
-                      placeholder="e.g., 'Introduction to...'"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button disabled={!isValid || isSubmitting} type="submit">
-              Create
+      </CardHeader>
+
+      <CardContent>
+        {isCreating && (
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 mb-6"
+            >
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        disabled={isSubmitting}
+                        placeholder="e.g., 'Introduction to React Hooks'"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-center gap-2">
+                <Button
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  className="gap-2"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <BookOpen className="h-4 w-4" />
+                  )}
+                  Create Lesson
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={toggleCreating}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </Form>
+        )}
+
+        {initialData.lessons.length === 0 && !isCreating ? (
+          <div className="text-center py-12">
+            <Video className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              No lessons yet
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Add your first lesson to get started
+            </p>
+            <Button onClick={toggleCreating} className="gap-2">
+              <PlusCircle className="h-4 w-4" />
+              Create First Lesson
             </Button>
-          </form>
-        </Form>
-      )}
-      {!isCreating && (
-        <>
-          <div
-            className={cn(
-              "text-sm mt-2",
-              !initialData.lessons.length && "text-slate-500 italic"
-            )}
-          >
-            {!initialData.lessons.length && "No lessons"}
+          </div>
+        ) : (
+          <>
             <LessonsList
               onEdit={onEdit}
               onReorder={onReorder}
               items={initialData.lessons || []}
             />
-          </div>
-          <p className="text-xs text-muted-foreground mt-4">
-            Drag and drop to reorder lessons
-          </p>
-        </>
-      )}
-    </div>
+            <p className="text-xs text-gray-500 mt-4 flex items-center gap-1">
+              <Grip className="h-3 w-3" />
+              Drag and drop to reorder lessons
+            </p>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 };

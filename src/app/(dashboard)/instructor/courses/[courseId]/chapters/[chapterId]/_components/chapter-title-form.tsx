@@ -1,6 +1,5 @@
-// File: .../_components/chapter-title-form.tsx
-// This is nearly identical to LessonTitleForm, just with different props/API endpoint
 "use client";
+
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -14,23 +13,37 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, Check, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Chapter } from "@prisma/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const formSchema = z.object({ title: z.string().min(1) });
 
-export const ChapterTitleForm = ({ initialData, courseId, chapterId }) => {
+interface ChapterTitleFormProps {
+  initialData: Chapter;
+  courseId: string;
+  chapterId: string;
+}
+
+export const ChapterTitleForm = ({
+  initialData,
+  courseId,
+  chapterId,
+}: ChapterTitleFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
   const toggleEdit = () => setIsEditing((current) => !current);
+
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: { title: initialData.title },
+    defaultValues: { title: initialData.title || "" },
   });
+
   const { isSubmitting, isValid } = form.formState;
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       await fetch(`/api/courses/${courseId}/chapters/${chapterId}`, {
         method: "PATCH",
@@ -40,55 +53,79 @@ export const ChapterTitleForm = ({ initialData, courseId, chapterId }) => {
       toggleEdit();
       router.refresh();
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Failed to update title");
     }
   };
 
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
-      <div className="font-medium flex items-center justify-between">
-        Chapter title
-        <Button onClick={toggleEdit} variant="ghost">
+    <Card className="border-0 shadow-lg">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Pencil className="h-5 w-5 text-blue-600" />
+          </div>
+          <CardTitle className="text-lg font-semibold">Chapter Title</CardTitle>
+        </div>
+        <Button
+          onClick={toggleEdit}
+          variant="ghost"
+          size="sm"
+          className="gap-2"
+        >
           {isEditing ? (
-            "Cancel"
+            <>
+              <X className="h-4 w-4" />
+              Cancel
+            </>
           ) : (
             <>
-              <Pencil className="h-4 w-4 mr-2" /> Edit title
+              <Pencil className="h-4 w-4" />
+              Edit Title
             </>
           )}
         </Button>
-      </div>
-      {!isEditing && <p className="text-sm mt-2">{initialData.title}</p>}
-      {isEditing && (
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4 mt-4"
-          >
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      disabled={isSubmitting}
-                      placeholder="e.g., 'Introduction'"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex items-center gap-x-2">
-              <Button disabled={!isValid || isSubmitting} type="submit">
-                Save
-              </Button>
-            </div>
-          </form>
-        </Form>
-      )}
-    </div>
+      </CardHeader>
+      <CardContent>
+        {!isEditing ? (
+          <p className="text-gray-900 font-medium text-lg">
+            {initialData.title}
+          </p>
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        disabled={isSubmitting}
+                        placeholder="e.g., 'Introduction to the Course'"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-center gap-2">
+                <Button
+                  type="submit"
+                  disabled={!isValid || isSubmitting}
+                  className="gap-2"
+                >
+                  <Check className="h-4 w-4" />
+                  Save Changes
+                </Button>
+                <Button type="button" variant="outline" onClick={toggleEdit}>
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </Form>
+        )}
+      </CardContent>
+    </Card>
   );
 };

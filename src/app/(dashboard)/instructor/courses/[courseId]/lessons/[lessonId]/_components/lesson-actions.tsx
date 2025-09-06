@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
+import { Trash, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -16,10 +16,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 
 interface LessonActionsProps {
   disabled: boolean;
   courseId: string;
+  chapterId: string;
   lessonId: string;
   isPublished: boolean;
 }
@@ -27,6 +29,7 @@ interface LessonActionsProps {
 export const LessonActions = ({
   disabled,
   courseId,
+  chapterId,
   lessonId,
   isPublished,
 }: LessonActionsProps) => {
@@ -55,43 +58,76 @@ export const LessonActions = ({
       await fetch(`/api/courses/${courseId}/lessons/${lessonId}`, {
         method: "DELETE",
       });
-      toast.success("Lesson deleted");
+      toast.success("Lesson deleted successfully");
       router.refresh();
-      // Redirect back to the main course page as this lesson page no longer exists
-      router.push(`/instructor/courses/${courseId}`);
+      router.push(`/instructor/courses/${courseId}/chapters/${chapterId}`);
     } catch {
-      toast.error("Something went wrong");
+      toast.error("Failed to delete lesson");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center gap-x-2">
+    <div className="flex items-center gap-3">
+      <Badge
+        variant={isPublished ? "success" : "secondary"}
+        className="px-3 py-1"
+      >
+        {isPublished ? "Published" : "Draft"}
+      </Badge>
+
       <Button
         onClick={onPublishToggle}
         disabled={disabled || isLoading}
-        variant="outline"
+        variant={isPublished ? "outline" : "default"}
         size="sm"
+        className="gap-2"
       >
+        {isLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : isPublished ? (
+          <EyeOff className="h-4 w-4" />
+        ) : (
+          <Eye className="h-4 w-4" />
+        )}
         {isPublished ? "Unpublish" : "Publish"}
       </Button>
+
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button size="sm" variant="destructive" disabled={isLoading}>
+          <Button
+            size="sm"
+            variant="destructive"
+            disabled={isLoading}
+            className="gap-2"
+          >
             <Trash className="h-4 w-4" />
+            Delete
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Lesson</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone.
+              Are you sure you want to delete this lesson? This action cannot be
+              undone and will permanently remove the lesson content.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onDelete}>Continue</AlertDialogAction>
+            <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={onDelete}
+              disabled={isLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Trash className="h-4 w-4 mr-2" />
+              )}
+              Delete Lesson
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

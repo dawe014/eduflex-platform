@@ -1,7 +1,5 @@
-// File: src/components/instructor/stat-card.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LucideIcon } from "lucide-react"; // We'll install this
-
+import { LucideIcon } from "lucide-react";
 interface StatCardProps {
   title: string;
   value: string | number;

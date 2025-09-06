@@ -1,48 +1,35 @@
 import { Settings } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { getPlatformSettings } from "@/actions/settings-actions";
+import { SettingsForm } from "./_components/settings-form";
 
 export default async function AdminSettingsPage() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user || session.user.role !== "ADMIN")
+    return redirect("/dashboard");
+
+  const platformSettings = await getPlatformSettings();
+
   return (
-    <div className="container mx-auto p-4 md:p-6">
-      <div className="flex items-center gap-x-3 mb-8">
-        <Settings className="h-8 w-8 text-primary" />
-        <h1 className="text-3xl font-bold">Platform Settings</h1>
+    <div className="container mx-auto p-4 md:p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-blue-100 rounded-lg">
+          <Settings className="h-6 w-6 text-blue-600" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Platform Settings
+          </h1>
+          <p className="text-gray-600">Configure global application settings</p>
+        </div>
       </div>
 
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle>General Settings</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center justify-between space-x-2">
-            <Label
-              htmlFor="new-registrations"
-              className="flex flex-col space-y-1"
-            >
-              <span>Allow New User Registrations</span>
-              <span className="font-normal leading-snug text-muted-foreground">
-                Disable this to prevent new users from signing up.
-              </span>
-            </Label>
-            <Switch id="new-registrations" defaultChecked />
-          </div>
-          <div className="flex items-center justify-between space-x-2">
-            <Label htmlFor="new-courses" className="flex flex-col space-y-1">
-              <span>Allow New Course Submissions</span>
-              <span className="font-normal leading-snug text-muted-foreground">
-                Disable this to prevent instructors from creating new courses.
-              </span>
-            </Label>
-            <Switch id="new-courses" defaultChecked />
-          </div>
-          <div className="text-right">
-            <Button>Save Settings</Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <SettingsForm initialSettings={platformSettings} />
+      </div>
     </div>
   );
 }

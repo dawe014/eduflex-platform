@@ -1,9 +1,7 @@
-// File: src/components/courses/enrolled-course-card.tsx
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { BookOpen } from "lucide-react";
 
 interface EnrolledCourseCardProps {
   course: {
@@ -29,7 +27,6 @@ export const EnrolledCourseCard = ({
               fill
               className="object-cover"
             />
-            {/* Dark overlay for better text readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
           </div>
         </CardHeader>

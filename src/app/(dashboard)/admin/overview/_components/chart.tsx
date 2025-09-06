@@ -12,24 +12,18 @@ import {
 } from "recharts";
 
 interface ChartProps {
-  data: {
-    name: string;
-    total: number;
-  }[];
+  data: { name: string; [key: string]: number | string }[];
+  dataKey: string;
+  color: string;
 }
 
-export const Chart = ({ data }: ChartProps) => {
+export const Chart = ({ data, dataKey, color }: ChartProps) => {
   return (
     <Card className="p-4 pt-8">
       <ResponsiveContainer width="100%" height={350}>
         <BarChart
           data={data}
-          margin={{
-            top: 5,
-            right: 20,
-            left: 0,
-            bottom: 5,
-          }}
+          margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
         >
           <XAxis
             dataKey="name"
@@ -37,16 +31,15 @@ export const Chart = ({ data }: ChartProps) => {
             fontSize={12}
             tickLine={false}
             axisLine={false}
-            // Optional: rotate labels if they are long
-            // angle={-45}
-            // textAnchor="end"
           />
           <YAxis
             stroke="#888888"
             fontSize={12}
             tickLine={false}
             axisLine={false}
-            tickFormatter={(value) => `$${value}`} // Format ticks as currency
+            tickFormatter={(value) =>
+              dataKey === "revenue" ? `$${value}` : `${value}`
+            }
           />
           <Tooltip
             cursor={{ fill: "transparent" }}
@@ -56,7 +49,12 @@ export const Chart = ({ data }: ChartProps) => {
               borderRadius: "0.5rem",
             }}
             labelStyle={{ fontWeight: "bold" }}
-            formatter={(value) => [`$${Number(value).toFixed(2)}`, "Revenue"]}
+            formatter={(value) => {
+              const label = dataKey.charAt(0).toUpperCase() + dataKey.slice(1);
+              const formattedValue =
+                dataKey === "revenue" ? `$${Number(value).toFixed(2)}` : value;
+              return [formattedValue, label];
+            }}
           />
           <Legend
             iconType="circle"
@@ -66,10 +64,10 @@ export const Chart = ({ data }: ChartProps) => {
             wrapperStyle={{ top: -10, right: 0 }}
           />
           <Bar
-            dataKey="total"
-            fill="#0369a1" // A nice sky-700 color
+            dataKey={dataKey}
+            fill={color}
             radius={[4, 4, 0, 0]}
-            name="Revenue" // Name for the legend and tooltip
+            name={dataKey.charAt(0).toUpperCase() + dataKey.slice(1)}
           />
         </BarChart>
       </ResponsiveContainer>

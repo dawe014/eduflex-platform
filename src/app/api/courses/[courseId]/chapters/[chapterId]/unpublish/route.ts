@@ -39,7 +39,7 @@ export async function PATCH(
     });
 
     // 4. Advanced Logic: If unpublishing this chapter means no other chapters
-    // in the course are published, then unpublish the entire course as well.
+
     const publishedChaptersInCourse = await db.chapter.findMany({
       where: {
         courseId: params.courseId,
@@ -60,7 +60,7 @@ export async function PATCH(
 
     return NextResponse.json(unpublishedChapter);
   } catch (error) {
-    console.log("[CHAPTER_UNPUBLISH]", error);
+    console.error("[UNPUBLISH_CHAPTER]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
