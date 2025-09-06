@@ -59,8 +59,8 @@ export const ReviewModal = ({ courseId, existingReview }: ReviewModalProps) => {
         const result = await submitReview(courseId, values);
         toast.success(result.message);
         setIsOpen(false);
-      } catch (error: any) {
-        toast.error(error.message);
+      } catch (error) {
+        toast.error((error as Error).message || "Something went wrong");
       }
     });
   };

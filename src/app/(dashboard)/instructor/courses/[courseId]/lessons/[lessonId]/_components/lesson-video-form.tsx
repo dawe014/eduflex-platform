@@ -1,6 +1,5 @@
 "use client";
 
-import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Pencil, PlusCircle, Video, X, Upload, Play } from "lucide-react";
@@ -19,10 +18,6 @@ interface LessonVideoFormProps {
   lessonId: string;
 }
 
-const formSchema = z.object({
-  videoUrl: z.string().min(1),
-});
-
 export const LessonVideoForm = ({
   initialData,
   courseId,
@@ -35,7 +30,7 @@ export const LessonVideoForm = ({
 
   const toggleEdit = () => setIsEditing((current) => !current);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: { videoUrl: string }) => {
     try {
       setIsUploading(true);
       await fetch(`/api/courses/${courseId}/lessons/${lessonId}`, {

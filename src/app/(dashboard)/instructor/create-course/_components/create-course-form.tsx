@@ -55,12 +55,12 @@ export const CreateCourseForm = () => {
     startTransition(async () => {
       try {
         await createCourse(formData);
-      } catch (error) {
-        const isRedirectError = (error as any)?.digest?.includes(
-          "NEXT_REDIRECT"
-        );
-        if (isRedirectError) {
-          throw error;
+      } catch (error: unknown) {
+        if (typeof error === "object" && error !== null && "digest" in error) {
+          const digest = (error as { digest?: string }).digest;
+          if (digest?.includes("NEXT_REDIRECT")) {
+            throw error;
+          }
         }
 
         if (error instanceof Error) {

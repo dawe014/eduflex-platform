@@ -15,14 +15,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { db } from "@/lib/db"; // Import db to fetch real stats
 
-// This is a client component, but we can't use async/await directly.
-// A better pattern for dynamic stats on a static page is to fetch them in a parent Server Component
-// or use a client-side fetching hook. For simplicity, we'll keep them static for now.
-
-// --- CORRECTED TYPE ---
-// Specify that the icon is a React Component that accepts LucideProps
 type Value = {
   icon: React.ComponentType<LucideProps>;
   title: string;

@@ -1,6 +1,5 @@
 "use client";
 
-import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, Pencil, PlusCircle, X } from "lucide-react";
@@ -16,12 +15,6 @@ interface ImageFormProps {
   courseId: string;
 }
 
-const formSchema = z.object({
-  imageUrl: z.string().min(1, {
-    message: "Image is required",
-  }),
-});
-
 export const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -29,7 +22,7 @@ export const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
 
   const toggleEdit = () => setIsEditing((current) => !current);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: { imageUrl: string }) => {
     try {
       setIsUploading(true);
       await fetch(`/api/courses/${courseId}`, {

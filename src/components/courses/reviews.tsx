@@ -2,7 +2,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useSession } from "next-auth/react";
 
 // Define a more complete type for reviews with user info
 type ReviewWithUser = {
