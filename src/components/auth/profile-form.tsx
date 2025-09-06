@@ -26,9 +26,11 @@ import {
 import { toast } from "sonner";
 import { User } from "@prisma/client";
 import { Separator } from "@/components/ui/separator";
+import { useTransition } from "react";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(2, "Name must be at least 2 characters."),
   bio: z.string().optional(),
 });
 
@@ -38,25 +40,33 @@ interface ProfileFormProps {
 
 export const ProfileForm = ({ user }: ProfileFormProps) => {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { name: user.name || "", bio: user.bio || "" },
   });
-  const { isSubmitting } = form.formState;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const response = await fetch("/api/profile", {
-        method: "PATCH",
-        body: JSON.stringify(values),
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!response.ok) throw new Error("Failed to update profile");
-      toast.success("Profile updated successfully!");
-      router.refresh();
-    } catch (error: any) {
-      toast.error(error.message || "Something went wrong.");
-    }
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    startTransition(async () => {
+      try {
+        const response = await fetch("/api/profile", {
+          method: "PATCH",
+          body: JSON.stringify(values),
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!response.ok)
+          throw new Error("Failed to update profile. Please try again.");
+        toast.success("Profile updated successfully!");
+        router.refresh();
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
+      }
+    });
   };
 
   return (
@@ -64,12 +74,12 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
       <CardHeader>
         <CardTitle>Public Profile</CardTitle>
         <CardDescription>
-          This information will be displayed publicly.
+          This information will be displayed publicly on your courses.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6">
-          <Avatar className="h-24 w-24">
+          <Avatar className="h-24 w-24 border">
             <AvatarImage src={user.image || ""} />
             <AvatarFallback className="text-3xl">
               {user.name?.slice(0, 2).toUpperCase()}
@@ -93,7 +103,11 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                 <FormItem>
                   <FormLabel>Display Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Your full name" />
+                    <Input
+                      {...field}
+                      placeholder="Your full name"
+                      disabled={isPending}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -111,6 +125,7 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
                         {...field}
                         placeholder="Tell students about your expertise, background, and teaching style."
                         rows={4}
+                        disabled={isPending}
                       />
                     </FormControl>
                     <FormMessage />
@@ -119,8 +134,14 @@ export const ProfileForm = ({ user }: ProfileFormProps) => {
               />
             )}
             <div className="flex justify-end">
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Changes"}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
               </Button>
             </div>
           </form>

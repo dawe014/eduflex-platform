@@ -18,19 +18,31 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Enrollment, Course } from "@prisma/client";
 
-// Helper function to group data by month
-const groupEnrollmentsByMonth = (enrollments: { createdAt: Date }[]) => {
-  const monthlyData: { [key: string]: number } = {};
+type EnrollmentForChart = Pick<Enrollment, "createdAt"> & {
+  course: Pick<Course, "price">;
+};
+
+// Helper function to process data for the chart
+const groupEnrollmentsByMonth = (
+  enrollments: EnrollmentForChart[],
+  coursePrice: number | null
+) => {
+  const monthlyData: { [key: string]: { revenue: number; students: number } } =
+    {};
 
   for (const enrollment of enrollments) {
     const month = new Date(enrollment.createdAt).toLocaleString("default", {
       month: "short",
     });
-    monthlyData[month] = (monthlyData[month] || 0) + 1;
+    if (!monthlyData[month]) {
+      monthlyData[month] = { revenue: 0, students: 0 };
+    }
+    monthlyData[month].revenue += coursePrice || 0;
+    monthlyData[month].students += 1;
   }
 
-  // Format for the chart
   const monthNames = [
     "Jan",
     "Feb",
@@ -47,8 +59,8 @@ const groupEnrollmentsByMonth = (enrollments: { createdAt: Date }[]) => {
   ];
   return monthNames.map((name) => ({
     name,
-    students: monthlyData[name] || 0,
-    revenue: (monthlyData[name] || 0) * (enrollments[0]?.course?.price || 0),
+    revenue: monthlyData[name]?.revenue || 0,
+    students: monthlyData[name]?.students || 0,
   }));
 };
 
@@ -57,10 +69,9 @@ export default async function CourseAnalyticsPage({
 }: {
   params: { courseId: string };
 }) {
-  const { courseId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return redirect("/");
-
+  const { courseId } = await params;
   const course = await db.course.findUnique({
     where: {
       id: courseId,
@@ -68,16 +79,13 @@ export default async function CourseAnalyticsPage({
     },
     include: {
       enrollments: {
-        include: { user: true },
         orderBy: { createdAt: "asc" },
       },
       chapters: {
         include: {
           lessons: {
             include: {
-              progress: {
-                where: { isCompleted: true },
-              },
+              progress: { where: { isCompleted: true } },
             },
           },
         },
@@ -98,7 +106,6 @@ export default async function CourseAnalyticsPage({
     (acc, chapter) => acc + chapter.lessons.length,
     0
   );
-
   const averageRating =
     course.reviews.length > 0
       ? course.reviews.reduce((acc, review) => acc + review.rating, 0) /
@@ -106,8 +113,13 @@ export default async function CourseAnalyticsPage({
       : 0;
   const ratingCount = course.reviews.length;
 
-  const chartData = groupEnrollmentsByMonth(course.enrollments as any);
-
+  const enrollmentsForChart: EnrollmentForChart[] = course.enrollments.map(
+    (e) => ({
+      createdAt: e.createdAt,
+      course: { price: course.price },
+    })
+  );
+  const chartData = groupEnrollmentsByMonth(enrollmentsForChart, course.price);
   const completedStudents = new Set<string>();
   for (const chapter of course.chapters) {
     for (const lesson of chapter.lessons) {

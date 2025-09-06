@@ -1,12 +1,6 @@
 import Link from "next/link";
 import { BookOpen, ArrowLeft, Sparkles } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreateCourseForm } from "./_components/create-course-form";
 
 const CreateCoursePage = () => {
@@ -79,13 +73,13 @@ const CreateCoursePage = () => {
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-purple-600" />
-                  What's Next?
+                  What&apos;s Next?
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-700">
-                  After creating your course, you'll be redirected to the setup
-                  page to add chapters, lessons, and more.
+                  After creating your course, you&apos;ll be redirected to the
+                  setup page to add chapters, lessons, and more.
                 </p>
               </CardContent>
             </Card>

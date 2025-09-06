@@ -15,7 +15,7 @@ import {
 import { HeroSlider } from "@/components/layout/hero-slider";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-
+import { Prisma } from "@prisma/client";
 interface BrowseCoursesPageProps {
   searchParams: {
     search?: string;
@@ -30,17 +30,20 @@ export default async function BrowseCoursesPage({
   const { search, categoryId } = await searchParams;
   const searchTerm = search || "";
 
-  const whereClause: any = {
+  const whereClause: Prisma.CourseWhereInput = {
     isPublished: true,
-    ...(searchTerm && {
-      OR: [
-        { title: { contains: searchTerm, mode: "insensitive" } },
-        { description: { contains: searchTerm, mode: "insensitive" } },
-      ],
-    }),
-    ...(categoryId && categoryId !== "all" && { categoryId }),
+    AND: [
+      searchTerm
+        ? {
+            OR: [
+              { title: { contains: searchTerm, mode: "insensitive" } },
+              { description: { contains: searchTerm, mode: "insensitive" } },
+            ],
+          }
+        : {},
+      categoryId && categoryId !== "all" ? { categoryId: categoryId } : {},
+    ],
   };
-
   const courses = await db.course.findMany({
     where: whereClause,
     include: {

@@ -2,7 +2,7 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { User, Shield, CreditCard, Bell } from "lucide-react";
+import { User, Shield, CreditCard } from "lucide-react";
 import { ProfileForm } from "@/components/auth/profile-form";
 import {
   Card,
@@ -11,7 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { ChangePasswordModal } from "@/components/auth/change-password-modal";
 import Link from "next/link";
 
@@ -68,7 +67,7 @@ export default async function ProfilePage() {
                   Security
                 </CardTitle>
                 <CardDescription className="text-gray-500">
-                  Manage your account's security settings.
+                  Manage your account&apos;s security settings.
                 </CardDescription>
               </CardHeader>
               <CardContent className="px-6 pb-6">

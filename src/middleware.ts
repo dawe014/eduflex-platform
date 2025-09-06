@@ -8,7 +8,6 @@ export default withAuth(
     const { token } = req.nextauth;
     const userRole = token?.role as UserRole;
 
-    console.log("role:", userRole, "path:", pathname);
     if (userRole === "NEW_USER" && pathname !== "/register/complete-profile") {
       return NextResponse.redirect(
         new URL("/register/complete-profile", req.url)

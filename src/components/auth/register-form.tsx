@@ -82,10 +82,12 @@ export const RegisterForm = ({ allowRegistrations }: RegisterFormProps) => {
           icon: <CheckCircle className="h-5 w-5 text-green-500" />,
         });
         router.push("/login");
-      } catch (error: any) {
-        toast.error("Registration failed", {
-          description: error.message || "Please check your information.",
-        });
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
       }
     });
   };

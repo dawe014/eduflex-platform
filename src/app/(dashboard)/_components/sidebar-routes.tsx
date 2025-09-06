@@ -11,7 +11,6 @@ import {
   Video,
   Home,
   CreditCard,
-  Shield,
   MessageSquare,
 } from "lucide-react";
 import { SidebarItem } from "./sidebar-item";

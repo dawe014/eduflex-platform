@@ -20,7 +20,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Plus, Sparkles, Lightbulb, Loader2 } from "lucide-react";
@@ -56,14 +55,19 @@ export const CreateCourseForm = () => {
     startTransition(async () => {
       try {
         await createCourse(formData);
-      } catch (error: any) {
-        const isRedirectError = error.digest?.includes("NEXT_REDIRECT");
-
+      } catch (error) {
+        const isRedirectError = (error as any)?.digest?.includes(
+          "NEXT_REDIRECT"
+        );
         if (isRedirectError) {
           throw error;
         }
 
-        toast.error(error.message || "Something went wrong.");
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
       }
     });
   };
@@ -104,7 +108,7 @@ export const CreateCourseForm = () => {
                       {...field}
                       id="title"
                       placeholder="e.g., 'Advanced Next.js Development...'"
-                      className="h-12 text-lg"
+                      className="h-12 text-lg mt-2"
                     />
                   </FormControl>
                   <FormMessage />
@@ -133,6 +137,7 @@ export const CreateCourseForm = () => {
                       id="description"
                       placeholder="Describe what students will learn..."
                       rows={3}
+                      className="mt-2"
                     />
                   </FormControl>
                   <FormMessage />
@@ -144,7 +149,7 @@ export const CreateCourseForm = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1 lg-flex-none"
+                className="flex-1 lg:flex-none"
                 onClick={() => router.push("/instructor/courses")}
               >
                 Cancel

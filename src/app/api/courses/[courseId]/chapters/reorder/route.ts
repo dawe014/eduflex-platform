@@ -33,6 +33,7 @@ export async function PUT(
 
     return new NextResponse("Success", { status: 200 });
   } catch (error) {
+    console.error("[CHAPTER_REORDER]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

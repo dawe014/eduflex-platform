@@ -236,7 +236,7 @@ export default async function MyLearningPage({
                     Your learning journey starts here!
                   </h3>
                   <p className="text-gray-600 mb-6">
-                    You haven't enrolled in any courses yet.
+                    You haven&apos;t enrolled in any courses yet.
                   </p>
                   <Button asChild className="bg-blue-600 hover:bg-blue-700">
                     <Link href="/courses">Explore Courses</Link>

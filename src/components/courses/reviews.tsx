@@ -21,8 +21,6 @@ interface ReviewsProps {
 }
 
 export const Reviews = ({ reviews }: ReviewsProps) => {
-  const { data: session } = useSession();
-
   const totalReviews = reviews.length;
   const avgRating =
     totalReviews > 0

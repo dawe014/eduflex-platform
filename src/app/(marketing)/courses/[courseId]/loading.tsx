@@ -5,7 +5,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CheckCircle, Users, BookOpen, Star, ListChecks } from "lucide-react";
+import { CheckCircle, BookOpen } from "lucide-react";
 
 const CourseIdLoading = () => {
   return (

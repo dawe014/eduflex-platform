@@ -2,14 +2,7 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
-import {
-  Users,
-  ArrowLeft,
-  Mail,
-  Calendar,
-  BookOpen,
-  Search,
-} from "lucide-react";
+import { Users, ArrowLeft, Mail, Calendar, Search } from "lucide-react";
 import {
   Table,
   TableBody,

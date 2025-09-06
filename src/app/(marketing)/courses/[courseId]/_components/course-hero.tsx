@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, Users, BookOpen, Calendar, Award, Play } from "lucide-react";
+import { Star, Users, BookOpen, Calendar, Play } from "lucide-react";
 import { VideoPlayerModal } from "@/components/courses/video-player-modal";
 import { Course, Category, Review, Enrollment } from "@prisma/client";
 

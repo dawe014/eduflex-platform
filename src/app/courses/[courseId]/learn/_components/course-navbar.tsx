@@ -28,8 +28,6 @@ export const CourseNavbar = ({
   progressPercentage,
   existingReview,
 }: CourseNavbarProps) => {
-  const completedLessonIds = new Set<string>();
-
   return (
     <div className="w-full bg-white/80 backdrop-blur-md border-b border-gray-200/50 h-20 px-4 sm:px-6">
       <div className="flex items-center h-full gap-4">

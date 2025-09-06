@@ -6,7 +6,7 @@ import { BookOpen, TrendingUp, Clock, Award } from "lucide-react";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default async function StudentDashboard() {
   const session = await getServerSession(authOptions);
@@ -187,7 +187,7 @@ export default async function StudentDashboard() {
                 No courses yet
               </h3>
               <p className="text-gray-600 mb-6">
-                You haven't enrolled in any courses yet.
+                You haven&apos;t enrolled in any courses yet.
               </p>
               <Button asChild className="bg-blue-600 hover:bg-blue-700">
                 <Link href="/courses">Explore Courses</Link>

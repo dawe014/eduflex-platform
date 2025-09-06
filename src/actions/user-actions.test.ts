@@ -39,7 +39,6 @@ const generateMongoId = () => new Types.ObjectId().toHexString();
 
 // --- Define Types for Mock Data ---
 type MockSession = Session & { user: { id: string; role: UserRole } };
-type MockUser = Partial<User>;
 
 describe("User Server Actions", () => {
   beforeEach(() => {

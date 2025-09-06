@@ -1,11 +1,4 @@
-import {
-  BarChart,
-  Users,
-  Video,
-  DollarSign,
-  BookOpen,
-  TrendingUp,
-} from "lucide-react";
+import { BarChart, Users, Video, DollarSign, TrendingUp } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -18,11 +11,14 @@ import { Chart } from "./_components/chart";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { Enrollment, Course } from "@prisma/client";
+
+type EnrollmentWithPrice = Enrollment & {
+  course: Pick<Course, "price"> | null;
+};
 
 // Helper function to process data for the chart
-const groupDataByMonth = (
-  enrollments: { createdAt: Date; course?: { price?: number | null } }[]
-) => {
+const groupDataByMonth = (enrollments: EnrollmentWithPrice[]) => {
   const monthlyRevenue: { [key: string]: number } = {};
 
   for (const enrollment of enrollments) {
@@ -68,7 +64,11 @@ export default async function AdminOverviewPage() {
         orderBy: { createdAt: "asc" },
       }),
       db.user.count({
-        where: { createdAt: { gte: new Date(new Date().setDate(1)) } },
+        where: {
+          createdAt: {
+            gte: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+          },
+        },
       }),
     ]);
 
@@ -76,9 +76,7 @@ export default async function AdminOverviewPage() {
     (acc, e) => acc + (e.course?.price || 0),
     0
   );
-  const totalEnrollments = enrollments.length;
-
-  const chartData = groupDataByMonth(enrollments as any);
+  const chartData = groupDataByMonth(enrollments as EnrollmentWithPrice[]);
 
   return (
     <div className="container mx-auto p-4 md:p-6 space-y-6">
@@ -91,81 +89,61 @@ export default async function AdminOverviewPage() {
             Platform Overview
           </h1>
           <p className="text-gray-600">
-            A high-level look at your platform's performance
+            A high-level look at your platform&apos;s performance
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Total Revenue
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  $
-                  {totalRevenue.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-              </div>
-              <div className="p-3 bg-green-100 rounded-full">
-                <DollarSign className="h-6 w-6 text-green-600" />
-              </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              $
+              {totalRevenue.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </div>
           </CardContent>
         </Card>
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Total Students
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {totalUsers.toLocaleString()}
-                </p>
-              </div>
-              <div className="p-3 bg-blue-100 rounded-full">
-                <Users className="h-6 w-6 text-blue-600" />
-              </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {totalUsers.toLocaleString()}
             </div>
           </CardContent>
         </Card>
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Published Courses
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {totalCourses.toLocaleString()}
-                </p>
-              </div>
-              <div className="p-3 bg-purple-100 rounded-full">
-                <Video className="h-6 w-6 text-purple-600" />
-              </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Published Courses
+            </CardTitle>
+            <Video className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {totalCourses.toLocaleString()}
             </div>
           </CardContent>
         </Card>
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  New Users This Month
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  +{newUsersThisMonth.toLocaleString()}
-                </p>
-              </div>
-              <div className="p-3 bg-orange-100 rounded-full">
-                <TrendingUp className="h-6 w-6 text-orange-600" />
-              </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              New Users (Last 30 Days)
+            </CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              +{newUsersThisMonth.toLocaleString()}
             </div>
           </CardContent>
         </Card>

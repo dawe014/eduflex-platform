@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, ArrowRight, BookOpen, Clock, AlertCircle } from "lucide-react";
+import { ArrowRight, BookOpen, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
 export default async function CourseLearnRootPage({
@@ -51,23 +51,6 @@ export default async function CourseLearnRootPage({
   const firstChapter = course.chapters[0];
   const firstLesson = firstChapter?.lessons[0];
 
-  // Calculate total course duration
-  const totalDuration = course.chapters.reduce((total, chapter) => {
-    return (
-      total +
-      chapter.lessons.reduce((chapterTotal, lesson) => {
-        return chapterTotal + (lesson.duration || 0);
-      }, 0)
-    );
-  }, 0);
-
-  // Format duration to hours and minutes
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-  };
-
   if (!firstLesson) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8">
@@ -81,7 +64,7 @@ export default async function CourseLearnRootPage({
                 Course Not Ready Yet
               </CardTitle>
               <CardDescription className="text-lg text-muted-foreground">
-                This course doesn't have any published lessons yet.
+                This course doesn&apos;t have any published lessons yet.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
@@ -110,6 +93,6 @@ export default async function CourseLearnRootPage({
     );
   }
 
-  // If there's a first lesson, redirect to it
+  // If there&apos;s a first lesson, redirect to it
   return redirect(`/courses/${courseId}/learn/lessons/${firstLesson.id}`);
 }

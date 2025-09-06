@@ -37,6 +37,7 @@ export async function PATCH(
 
     return NextResponse.json(publishedLesson);
   } catch (error) {
+    console.error("[PUBLISH_LESSON]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

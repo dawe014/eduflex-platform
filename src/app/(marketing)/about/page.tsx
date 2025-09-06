@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,13 +10,21 @@ import {
   Heart,
   CheckCircle,
   ArrowRight,
+  LucideProps,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { db } from "@/lib/db"; // Import db to fetch real stats
 
+// This is a client component, but we can't use async/await directly.
+// A better pattern for dynamic stats on a static page is to fetch them in a parent Server Component
+// or use a client-side fetching hook. For simplicity, we'll keep them static for now.
+
+// --- CORRECTED TYPE ---
+// Specify that the icon is a React Component that accepts LucideProps
 type Value = {
-  icon: React.ReactElement<any>;
+  icon: React.ComponentType<LucideProps>;
   title: string;
   description: string;
   colorClass: {
@@ -26,7 +36,7 @@ type Value = {
 type ValueCardProps = Value;
 
 const ValueCard: React.FC<ValueCardProps> = ({
-  icon,
+  icon: Icon,
   title,
   description,
   colorClass,
@@ -36,7 +46,7 @@ const ValueCard: React.FC<ValueCardProps> = ({
       <div
         className={`p-4 rounded-full ${colorClass.bg} group-hover:scale-110 transition-transform duration-300`}
       >
-        {React.cloneElement(icon, { className: `h-8 w-8 ${colorClass.text}` })}
+        <Icon className={`h-8 w-8 ${colorClass.text}`} />
       </div>
       <CardTitle className="mt-4 text-xl font-semibold text-gray-800">
         {title}
@@ -50,42 +60,42 @@ const ValueCard: React.FC<ValueCardProps> = ({
 
 const values: Value[] = [
   {
-    icon: <BookOpen />,
+    icon: BookOpen,
     title: "Accessibility",
     description:
       "Making high-quality education available to everyone, regardless of background or location.",
     colorClass: { bg: "bg-blue-100", text: "text-blue-600" },
   },
   {
-    icon: <Users />,
+    icon: Users,
     title: "Community",
     description:
       "Fostering a supportive environment where learners and instructors connect, collaborate, and grow.",
     colorClass: { bg: "bg-purple-100", text: "text-purple-600" },
   },
   {
-    icon: <Zap />,
+    icon: Zap,
     title: "Innovation",
     description:
       "Relentlessly pursuing new and better ways to learn, teach, and engage with educational content.",
     colorClass: { bg: "bg-amber-100", text: "text-amber-600" },
   },
   {
-    icon: <Award />,
+    icon: Award,
     title: "Excellence",
     description:
       "Committing to the highest standards in our content, platform technology, and user support.",
     colorClass: { bg: "bg-green-100", text: "text-green-600" },
   },
   {
-    icon: <Heart />,
+    icon: Heart,
     title: "Passion",
     description:
       "We are driven by a genuine love for learning and a belief in its power to transform lives.",
     colorClass: { bg: "bg-red-100", text: "text-red-600" },
   },
   {
-    icon: <CheckCircle />,
+    icon: CheckCircle,
     title: "Integrity",
     description:
       "Operating with transparency and honesty to build lasting trust with our global community.",
@@ -94,6 +104,13 @@ const values: Value[] = [
 ];
 
 const AboutPage: React.FC = () => {
+  const stats = {
+    learners: "1M+",
+    courses: "5K+",
+    countries: "150+",
+    satisfaction: "98%",
+  };
+
   return (
     <div className="bg-slate-50 text-gray-800">
       {/* Hero Section */}
@@ -106,8 +123,8 @@ const AboutPage: React.FC = () => {
             </span>
           </h1>
           <p className="mt-6 max-w-3xl mx-auto text-lg sm:text-xl text-muted-foreground">
-            At EduFlex, we're building a world where anyone, anywhere can unlock
-            their potential through accessible, engaging, and world-class
+            At EduFlex, we&apos;re building a world where anyone, anywhere can
+            unlock their potential through accessible, engaging, and world-class
             learning experiences.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
@@ -138,25 +155,25 @@ const AboutPage: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <p className="text-4xl md:text-5xl font-bold text-gray-900">
-                1M+
+                {stats.learners}
               </p>
               <p className="text-muted-foreground mt-1">Learners</p>
             </div>
             <div>
               <p className="text-4xl md:text-5xl font-bold text-gray-900">
-                5K+
+                {stats.courses}
               </p>
               <p className="text-muted-foreground mt-1">Courses</p>
             </div>
             <div>
               <p className="text-4xl md:text-5xl font-bold text-gray-900">
-                150+
+                {stats.countries}
               </p>
               <p className="text-muted-foreground mt-1">Countries</p>
             </div>
             <div>
               <p className="text-4xl md:text-5xl font-bold text-gray-900">
-                98%
+                {stats.satisfaction}
               </p>
               <p className="text-muted-foreground mt-1">Satisfaction</p>
             </div>
@@ -201,7 +218,7 @@ const AboutPage: React.FC = () => {
             <Image
               src="/images/mission-vision.jpg"
               alt="A diverse group of students collaborating online"
-              layout="fill"
+              fill
               objectFit="cover"
               className="transform group-hover:scale-105 transition-transform duration-500"
             />
@@ -241,7 +258,8 @@ const AboutPage: React.FC = () => {
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-blue-100">
             Join millions of learners and thousands of instructors on the
-            platform that's built for growth. Your next chapter starts here.
+            platform that&apos;s built for growth. Your next chapter starts
+            here.
           </p>
           <div className="mt-8">
             <Button

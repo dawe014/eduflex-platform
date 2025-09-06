@@ -32,8 +32,12 @@ export const WishlistButton = ({
       try {
         const result = await toggleWishlist(courseId, pathname);
         toast.success(result.message);
-      } catch (error: any) {
-        toast.error(error.message);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unknown error occurred.");
+        }
       }
     });
   };

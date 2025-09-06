@@ -11,7 +11,6 @@ import {
   BookOpen,
   CheckCircle,
   AlertCircle,
-  Clock,
   BarChart3,
 } from "lucide-react";
 import { IconBadge } from "@/components/icon-badge";

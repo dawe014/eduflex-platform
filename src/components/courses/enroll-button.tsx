@@ -12,7 +12,7 @@ interface EnrollButtonProps {
 
 export const EnrollButton = ({ courseId }: EnrollButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
 
   const handleEnroll = async () => {
     if (status === "unauthenticated") {

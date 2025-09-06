@@ -1,15 +1,8 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
-import { notFound, redirect } from "next/navigation";
-import {
-  DollarSign,
-  Users,
-  Video,
-  TrendingUp,
-  Calendar,
-  CreditCard,
-} from "lucide-react";
+import { redirect } from "next/navigation";
+import { DollarSign, Users, Video, TrendingUp, CreditCard } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Chart } from "../../admin/overview/_components/chart";
 import {
@@ -20,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 

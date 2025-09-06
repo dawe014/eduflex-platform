@@ -44,6 +44,7 @@ import {
   Calendar,
   ArrowUpRight,
   MailOpen,
+  Loader2,
 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -61,15 +62,18 @@ export const MessageActions = ({ message }: { message: MessageWithUser }) => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Mark as read when the view modal is opened
   const handleOpenChange = (open: boolean) => {
     setIsModalOpen(open);
     if (open && message.status === "UNREAD") {
       startTransition(async () => {
         try {
           await updateMessageStatus(message.id, "READ");
-        } catch (error: any) {
-          toast.error(error.message);
+        } catch (error) {
+          if (error instanceof Error) {
+            toast.error(error.message);
+          } else {
+            toast.error("An unexpected error occurred while marking as read.");
+          }
         }
       });
     }
@@ -80,8 +84,12 @@ export const MessageActions = ({ message }: { message: MessageWithUser }) => {
       try {
         const result = await updateMessageStatus(message.id, "ARCHIVED");
         toast.success(result.message);
-      } catch (error: any) {
-        toast.error(error.message);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Failed to archive the message.");
+        }
       }
     });
   };
@@ -91,8 +99,12 @@ export const MessageActions = ({ message }: { message: MessageWithUser }) => {
       try {
         const result = await updateMessageStatus(message.id, "UNREAD");
         toast.success(result.message);
-      } catch (error: any) {
-        toast.error(error.message);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Failed to mark as unread.");
+        }
       }
     });
   };
@@ -103,8 +115,12 @@ export const MessageActions = ({ message }: { message: MessageWithUser }) => {
         const result = await deleteContactMessage(message.id);
         toast.success(result.message);
         setIsAlertOpen(false);
-      } catch (error: any) {
-        toast.error(error.message);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("Failed to delete the message.");
+        }
       }
     });
   };
@@ -139,7 +155,6 @@ export const MessageActions = ({ message }: { message: MessageWithUser }) => {
                 View Message
               </DropdownMenuItem>
             </DialogTrigger>
-
             {message.status === "READ" || message.status === "ARCHIVED" ? (
               <DropdownMenuItem
                 onClick={onMarkAsUnread}
@@ -159,9 +174,7 @@ export const MessageActions = ({ message }: { message: MessageWithUser }) => {
                 Archive
               </DropdownMenuItem>
             )}
-
             <DropdownMenuSeparator />
-
             <DropdownMenuItem
               onClick={() => setIsAlertOpen(true)}
               disabled={isPending}
@@ -321,10 +334,10 @@ export const MessageActions = ({ message }: { message: MessageWithUser }) => {
               className="flex-1 sm:flex-none order-1 sm:order-2 bg-red-600 hover:bg-red-700 text-white"
             >
               {isPending ? (
-                <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Deleting...
-                </div>
+                </>
               ) : (
                 "Yes, delete message"
               )}

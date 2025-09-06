@@ -30,7 +30,7 @@ import { authOptions } from "@/lib/auth";
 import { Pagination } from "@/components/pagination";
 import { MessageActions } from "./_components/message-actions";
 import { MessageFilters } from "./_components/message-filters";
-import { MessageStatus } from "@prisma/client";
+import { MessageStatus, Prisma } from "@prisma/client";
 import { cn } from "@/lib/utils";
 
 const MESSAGES_PER_PAGE = 10;
@@ -47,13 +47,12 @@ export default async function AdminMessagesPage({
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "ADMIN")
     return redirect("/dashboard");
-  const { search, page, status } = await searchParams;
+  const { page, status, search } = await searchParams;
   const currentPage = Number(page) || 1;
   const statusFilter = status;
   const searchTerm = search || "";
 
-  // --- Build Prisma Where Clause ---
-  const whereClause: any = {
+  const whereClause: Prisma.ContactMessageWhereInput = {
     AND: [
       statusFilter && statusFilter !== "all" ? { status: statusFilter } : {},
       searchTerm
@@ -200,7 +199,7 @@ export default async function AdminMessagesPage({
                 </p>
               </div>
             ) : (
-              <div className="rounded-lg overflow-hidden">
+              <div className="rounded-lg overflow-x-auto">
                 <Table>
                   <TableHeader className="bg-gray-50/50">
                     <TableRow>
@@ -285,17 +284,7 @@ export default async function AdminMessagesPage({
                           </div>
                         </TableCell>
                         <TableCell className="text-right pr-6">
-                          <MessageActions
-                            message={{
-                              ...message,
-                              user: message.user
-                                ? {
-                                    ...message.user,
-                                    name: message.user.name ?? "",
-                                  }
-                                : null,
-                            }}
-                          />
+                          <MessageActions message={message} />
                         </TableCell>
                       </TableRow>
                     ))}

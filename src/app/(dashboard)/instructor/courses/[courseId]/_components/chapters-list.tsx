@@ -9,15 +9,7 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import { cn } from "@/lib/utils";
-import {
-  Grip,
-  Pencil,
-  BookOpen,
-  Clock,
-  Eye,
-  EyeOff,
-  Crown,
-} from "lucide-react";
+import { Grip, Pencil, BookOpen, Eye, EyeOff, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

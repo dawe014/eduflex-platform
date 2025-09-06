@@ -49,6 +49,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(user);
   } catch (error) {
+    console.error("[USER_REGISTER]", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

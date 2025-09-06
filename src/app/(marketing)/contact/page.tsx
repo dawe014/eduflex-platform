@@ -5,15 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Clock,
-  MessageSquare,
-  Send,
-  ArrowRight,
-} from "lucide-react";
+import { MessageSquare, Send, ArrowRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -45,15 +37,9 @@ const ContactPage = () => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-    },
+    defaultValues: { name: "", email: "", subject: "", message: "" },
   });
 
-  // Use useEffect to update form values when the session loads.
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
       form.reset({
@@ -76,8 +62,12 @@ const ContactPage = () => {
           subject: "",
           message: "",
         });
-      } catch (error: any) {
-        toast.error(error.message);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
       }
     });
   };
@@ -96,8 +86,8 @@ const ContactPage = () => {
               </span>
             </h1>
             <p className="text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed">
-              We'd love to hear from you. Whether you have a question, feedback,
-              or just want to say hello, our team is here to help.
+              We&apos;d love to hear from you. Whether you have a question,
+              feedback, or just want to say hello, our team is here to help.
             </p>
           </div>
         </div>
@@ -236,11 +226,12 @@ const ContactPage = () => {
                         <MessageSquare className="h-5 w-5 text-blue-500 mr-2" />
                         {item.q}
                       </h4>
-                      <p className="text-gray-600 text-sm">{item.a}</p>
+                      <p className="text-gray-600 text-sm">
+                        {item.a.replace(/'/g, "\u2019")}
+                      </p>
                     </div>
                   ))}
                 </div>
-
                 <div className="mt-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-6 text-white">
                   <h3 className="text-xl font-bold mb-3">
                     Need Immediate Help?
@@ -253,8 +244,7 @@ const ContactPage = () => {
                     variant="outline"
                     className="bg-white text-blue-600 hover:bg-gray-100 border-white w-full"
                   >
-                    Visit Help Center
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    Visit Help Center <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
               </div>

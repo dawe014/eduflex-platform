@@ -40,15 +40,16 @@ import {
   User,
   Mail,
   Shield,
-  UserCheck,
   Loader2,
+  GraduationCap,
 } from "lucide-react";
 import { UserRole } from "@prisma/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(2, "Name must be at least 2 characters."),
   email: z.string().email("A valid email is required"),
   role: z.nativeEnum(UserRole),
 });
@@ -75,8 +76,12 @@ export const AddUserModal = () => {
         setResult(res);
         toast.success(res.message);
         form.reset();
-      } catch (error: any) {
-        toast.error(error.message || "Failed to create user");
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
       }
     });
   };
@@ -104,7 +109,7 @@ export const AddUserModal = () => {
       case "ADMIN":
         return <Shield className="h-4 w-4" />;
       case "INSTRUCTOR":
-        return <UserCheck className="h-4 w-4" />;
+        return <GraduationCap className="h-4 w-4" />;
       default:
         return <User className="h-4 w-4" />;
     }
@@ -148,7 +153,6 @@ export const AddUserModal = () => {
 
         {result?.success ? (
           <div className="space-y-6 py-2">
-            {/* Success Message */}
             <div className="text-center">
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
                 <Check className="h-6 w-6 text-green-600" />
@@ -160,8 +164,6 @@ export const AddUserModal = () => {
                 {result.message} Share the temporary password with the user.
               </p>
             </div>
-
-            {/* Password Display */}
             <Card className="border-0 bg-gray-50">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
@@ -193,25 +195,10 @@ export const AddUserModal = () => {
                   </Button>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  This password will be required for the user's first login
+                  This password will be required for the user&apos;s first login
                 </p>
               </CardContent>
             </Card>
-
-            {/* Next Steps */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-semibold text-blue-900 text-sm mb-2">
-                Next Steps
-              </h4>
-              <ul className="text-xs text-blue-700 space-y-1">
-                <li>• Share the password securely with the user</li>
-                <li>
-                  • Instruct them to change their password after first login
-                </li>
-                <li>• The user will receive a welcome email</li>
-              </ul>
-            </div>
-
             <DialogFooter>
               <Button onClick={() => onOpenChange(false)} className="w-full">
                 Done
@@ -242,7 +229,6 @@ export const AddUserModal = () => {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="email"
@@ -264,7 +250,6 @@ export const AddUserModal = () => {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="role"
@@ -284,26 +269,23 @@ export const AddUserModal = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem
-                            value={UserRole.STUDENT}
-                            className="flex items-center gap-2"
-                          >
-                            <User className="h-4 w-4" />
-                            Student
+                          <SelectItem value={UserRole.STUDENT}>
+                            <div className="flex items-center gap-2">
+                              <User className="h-4 w-4" />
+                              Student
+                            </div>
                           </SelectItem>
-                          <SelectItem
-                            value={UserRole.INSTRUCTOR}
-                            className="flex items-center gap-2"
-                          >
-                            <UserCheck className="h-4 w-4" />
-                            Instructor
+                          <SelectItem value={UserRole.INSTRUCTOR}>
+                            <div className="flex items-center gap-2">
+                              <GraduationCap className="h-4 w-4" />
+                              Instructor
+                            </div>
                           </SelectItem>
-                          <SelectItem
-                            value={UserRole.ADMIN}
-                            className="flex items-center gap-2"
-                          >
-                            <Shield className="h-4 w-4" />
-                            Admin
+                          <SelectItem value={UserRole.ADMIN}>
+                            <div className="flex items-center gap-2">
+                              <Shield className="h-4 w-4" />
+                              Admin
+                            </div>
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -312,13 +294,12 @@ export const AddUserModal = () => {
                   )}
                 />
               </div>
-
-              {/* Role Description */}
               {form.watch("role") && (
                 <div
-                  className={`p-3 rounded-lg border ${getRoleColor(
-                    form.watch("role")
-                  )}`}
+                  className={cn(
+                    "p-3 rounded-lg border",
+                    getRoleColor(form.watch("role"))
+                  )}
                 >
                   <div className="flex items-center gap-2 mb-1">
                     {getRoleIcon(form.watch("role"))}
@@ -336,8 +317,7 @@ export const AddUserModal = () => {
                   </p>
                 </div>
               )}
-
-              <DialogFooter className="flex flex-col sm:flex-row gap-2">
+              <DialogFooter className="flex flex-col sm:flex-row gap-2 pt-2">
                 <DialogClose asChild>
                   <Button type="button" variant="outline" className="flex-1">
                     Cancel

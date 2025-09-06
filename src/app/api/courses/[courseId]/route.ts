@@ -39,6 +39,7 @@ export async function PATCH(
 
     return NextResponse.json(course);
   } catch (error) {
+    console.error("[COURSE_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -59,6 +60,7 @@ export async function DELETE(
 
     return NextResponse.json(deletedCourse);
   } catch (error) {
+    console.error("[COURSE_DELETE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

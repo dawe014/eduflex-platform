@@ -1,12 +1,9 @@
-import { Settings, Bell } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Settings } from "lucide-react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getPlatformSettings } from "@/actions/settings-actions";
 import { SettingsForm } from "./_components/settings-form";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export default async function AdminSettingsPage() {
   const session = await getServerSession(authOptions);

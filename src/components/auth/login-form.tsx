@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import {
@@ -21,7 +21,16 @@ import Link from "next/link";
 import { Social } from "./social";
 import { Separator } from "@/components/ui/separator";
 import { signIn } from "next-auth/react";
-import { Eye, EyeOff, Mail, Lock, ArrowRight, LogIn, Key } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  ArrowRight,
+  LogIn,
+  Key,
+  Loader2,
+} from "lucide-react";
 
 const formSchema = z.object({
   email: z.string().email("A valid email is required"),
@@ -29,7 +38,7 @@ const formSchema = z.object({
 });
 
 export const LoginForm = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
@@ -38,31 +47,31 @@ export const LoginForm = () => {
     defaultValues: { email: "", password: "" },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    try {
-      const result = await signIn("credentials", {
-        ...values,
-        redirect: false,
-      });
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    startTransition(async () => {
+      try {
+        const result = await signIn("credentials", {
+          ...values,
+          redirect: false,
+        });
 
-      if (result?.error) {
-        toast.error("Login failed", {
-          description: "Invalid email or password. Please try again.",
+        if (result?.error) {
+          toast.error("Login failed", {
+            description: result.error,
+          });
+        } else {
+          toast.success("Welcome back!");
+
+          router.push("/");
+        }
+      } catch (error) {
+        console.error("Login submission error:", error);
+        toast.error("Connection error", {
+          description:
+            "Could not connect to the server. Please try again later.",
         });
-      } else {
-        toast.success("Welcome back!", {
-          description: "You have successfully signed in to your account.",
-        });
-        router.push("/");
       }
-    } catch (error) {
-      toast.error("Connection error", {
-        description: "Unable to connect to the server. Please try again later.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   return (
@@ -94,47 +103,42 @@ export const LoginForm = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">
-                      Email Address
-                    </FormLabel>
+                    <FormLabel>Email Address</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                           {...field}
-                          disabled={isLoading}
+                          disabled={isPending}
                           placeholder="john.doe@example.com"
                           type="email"
-                          className="pl-10 py-3 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          className="pl-10"
                         />
                       </div>
                     </FormControl>
-                    <FormMessage className="text-xs" />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-gray-700">
-                      Password
-                    </FormLabel>
+                    <FormLabel>Password</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                           {...field}
-                          disabled={isLoading}
+                          disabled={isPending}
                           placeholder="••••••"
                           type={showPassword ? "text" : "password"}
-                          className="pl-10 pr-10 py-3 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                          className="pl-10 pr-10"
                         />
                         <button
                           type="button"
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? (
@@ -145,12 +149,11 @@ export const LoginForm = () => {
                         </button>
                       </div>
                     </FormControl>
-                    <FormMessage className="text-xs" />
-
+                    <FormMessage />
                     <div className="flex justify-end mt-1">
                       <Link
                         href="/forgot-password"
-                        className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors duration-300"
+                        className="text-xs text-blue-600 hover:text-blue-700 font-medium"
                       >
                         Forgot password?
                       </Link>
@@ -158,45 +161,40 @@ export const LoginForm = () => {
                   </FormItem>
                 )}
               />
-
               <Button
                 type="submit"
-                className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 font-medium rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
-                disabled={isLoading}
+                className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 font-medium"
+                disabled={isPending}
               >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                {isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Signing In...
-                  </div>
+                  </>
                 ) : (
-                  <div className="flex items-center justify-center">
+                  <>
                     Sign In <ArrowRight className="ml-2 h-4 w-4" />
-                  </div>
+                  </>
                 )}
               </Button>
             </form>
           </Form>
-
           <div className="relative my-6">
-            <Separator className="bg-gray-200" />
-            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-sm text-gray-500 font-medium">
+            <Separator />
+            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-sm text-gray-500">
               Or continue with
             </span>
           </div>
-
           <Social />
-
           <div className="mt-6 text-center text-sm text-gray-600">
             Don&apos;t have an account?{" "}
             <Link
               href="/register"
-              className="font-semibold text-blue-600 hover:text-blue-700 transition-colors duration-300"
+              className="font-semibold text-blue-600 hover:text-blue-700"
             >
               Sign up now
             </Link>
           </div>
-
           <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
             <div className="flex items-start">
               <Key className="h-4 w-4 text-blue-600 mt-0.5 mr-2 flex-shrink-0" />

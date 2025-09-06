@@ -4,7 +4,6 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Pagination as ShadcnPagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -18,7 +17,6 @@ interface PaginationProps {
 export const Pagination = ({ pageCount }: PaginationProps) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const currentPage = Number(searchParams.get("page")) || 1;
 
   const createPageURL = (pageNumber: number | string) => {
@@ -36,12 +34,17 @@ export const Pagination = ({ pageCount }: PaginationProps) => {
           <PaginationPrevious
             href={createPageURL(currentPage - 1)}
             aria-disabled={currentPage <= 1}
-            className={currentPage <= 1 ? "pointer-events-none opacity-50" : undefined}
+            className={
+              currentPage <= 1 ? "pointer-events-none opacity-50" : undefined
+            }
           />
         </PaginationItem>
         {pages.map((page) => (
           <PaginationItem key={page}>
-            <PaginationLink href={createPageURL(page)} isActive={currentPage === page}>
+            <PaginationLink
+              href={createPageURL(page)}
+              isActive={currentPage === page}
+            >
               {page}
             </PaginationLink>
           </PaginationItem>
@@ -50,7 +53,11 @@ export const Pagination = ({ pageCount }: PaginationProps) => {
           <PaginationNext
             href={createPageURL(currentPage + 1)}
             aria-disabled={currentPage >= pageCount}
-            className={currentPage >= pageCount ? "pointer-events-none opacity-50" : undefined}
+            className={
+              currentPage >= pageCount
+                ? "pointer-events-none opacity-50"
+                : undefined
+            }
           />
         </PaginationItem>
       </PaginationContent>

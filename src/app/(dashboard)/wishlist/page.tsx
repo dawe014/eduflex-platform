@@ -2,7 +2,7 @@ import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { Heart, ArrowRight, BookOpen, Search, Star } from "lucide-react";
+import { Heart, ArrowRight, BookOpen, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CourseCard } from "@/components/courses/course-card";
@@ -119,7 +119,9 @@ export default async function WishlistPage() {
           </div>
           <div>
             <h1 className="text-4xl font-bold text-gray-900">My Wishlist</h1>
-            <p className="text-gray-600 mt-2">Courses you've saved for later</p>
+            <p className="text-gray-600 mt-2">
+              Courses you&apos;ve saved for later
+            </p>
           </div>
         </div>
 

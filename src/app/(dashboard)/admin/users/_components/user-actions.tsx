@@ -46,8 +46,12 @@ export const UserActions = ({
       try {
         await updateUserRole(userId, role);
         toast.success("User role updated successfully.");
-      } catch (error: any) {
-        toast.error(error.message);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
       }
     });
   };
@@ -58,8 +62,12 @@ export const UserActions = ({
         const result = await deleteUser(userId);
         toast.success(result.message);
         setIsAlertOpen(false);
-      } catch (error: any) {
-        toast.error(error.message);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
       }
     });
   };

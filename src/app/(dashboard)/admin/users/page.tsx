@@ -1,13 +1,4 @@
-import {
-  Users,
-  Search,
-  Filter,
-  Plus,
-  Mail,
-  Shield,
-  Calendar,
-  UserCheck,
-} from "lucide-react";
+import { Users, Mail, Shield, Calendar, UserCheck } from "lucide-react";
 import { db } from "@/lib/db";
 import {
   Table,
@@ -21,14 +12,19 @@ import { Badge } from "@/components/ui/badge";
 import { UserActions } from "./_components/user-actions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserFilters } from "./_components/user-filters";
 import { Pagination } from "@/components/pagination";
-import { UserRole } from "@prisma/client";
+import { UserRole, Prisma } from "@prisma/client";
 import { AddUserModal } from "./_components/add-user-modal";
-import { NextResponse } from "next/server";
 
 const USERS_PER_PAGE = 10;
 
@@ -38,29 +34,29 @@ export default async function ManageUsersPage({
   searchParams: {
     page?: string;
     search?: string;
-    role?: UserRole | "all";
+    role?: UserRole;
     sort?: string;
   };
 }) {
-  const { page, search, role, sort } = await searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "ADMIN")
-    return NextResponse.redirect("/");
-
+    return redirect("/dashboard");
+  const { page, search, role, sort } = await searchParams;
   const currentPage = Number(page) || 1;
   const searchTerm = search || "";
-  const roleFilter = role;
+  const roleFilter = role || "all";
   const sortBy = sort || "newest";
 
-  // --- Construct Prisma Where and OrderBy Clauses ---
-  const whereClause: any = {
+  const whereClause: Prisma.UserWhereInput = {
     AND: [
-      {
-        OR: [
-          { name: { contains: searchTerm, mode: "insensitive" } },
-          { email: { contains: searchTerm, mode: "insensitive" } },
-        ],
-      },
+      searchTerm
+        ? {
+            OR: [
+              { name: { contains: searchTerm, mode: "insensitive" } },
+              { email: { contains: searchTerm, mode: "insensitive" } },
+            ],
+          }
+        : {},
       roleFilter && roleFilter !== "all" ? { role: roleFilter } : {},
     ],
   };
@@ -86,12 +82,9 @@ export default async function ManageUsersPage({
   const totalUsers = await db.user.count({ where: whereClause });
   const pageCount = Math.ceil(totalUsers / USERS_PER_PAGE);
 
-  // Stats  reflect the entire user base, not just the filtered results
   const allUsersStats = await db.user.groupBy({
     by: ["role"],
-    _count: {
-      role: true,
-    },
+    _count: { role: true },
   });
   const totalUserCount = await db.user.count();
   const totalInstructors =
@@ -198,10 +191,13 @@ export default async function ManageUsersPage({
       {/* Users Table */}
       <Card className="border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>All Users ({totalUsers})</CardTitle>
+          <CardTitle>All Users</CardTitle>
+          <CardDescription>
+            {totalUsers} user{totalUsers !== 1 ? "s" : ""} matching filters
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-lg border">
+        <CardContent className="p-0">
+          <div className="rounded-lg overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">

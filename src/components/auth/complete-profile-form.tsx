@@ -32,8 +32,12 @@ export const CompleteProfileForm = () => {
           role === "INSTRUCTOR" ? "/instructor/courses" : "/dashboard";
         router.push(path);
         router.refresh();
-      } catch (error: any) {
-        toast.error(error.message);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
       }
     });
   };

@@ -29,6 +29,7 @@ export async function PATCH(
 
     return NextResponse.json(chapter);
   } catch (error) {
+    console.error("[CHAPTER_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -39,7 +40,6 @@ export async function DELETE(
   { params }: { params: { courseId: string; chapterId: string } }
 ) {
   const session = await getServerSession(authOptions);
-  const values = await req.json();
   const { courseId, chapterId } = await params;
 
   if (!session?.user || session.user.role !== "INSTRUCTOR") {

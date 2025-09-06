@@ -7,8 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import ReactPlayer from "react-player";
-import { X, Play, Volume2, Maximize } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Play } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface VideoPlayerModalProps {

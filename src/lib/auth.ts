@@ -35,7 +35,9 @@ export const authOptions: NextAuthOptions = {
         }
 
         if (user.role === "NEW_USER") {
-          throw new Error("Account not fully set up. Please register first.");
+          throw new Error(
+            "This account has not been fully set up. Please use Google sign-in to complete your registration."
+          );
         }
 
         const isCorrectPassword = await bcrypt.compare(
@@ -54,12 +56,12 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        token.role = (user as any).role;
+        token.role = user.role;
         token.id = user.id;
       }
 
-      if (trigger === "update" && session?.role) {
-        token.role = session.role;
+      if (trigger === "update" && (session as any)?.role) {
+        token.role = (session as any).role;
       }
 
       return token;

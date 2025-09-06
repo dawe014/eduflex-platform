@@ -91,7 +91,6 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
     totalDuration: calculateChapterDuration(chapter.lessons),
   }));
 
-  const studentCount = course.enrollments.length;
   const reviewCount = course.reviews.length;
   const averageRating =
     reviewCount > 0
@@ -132,7 +131,7 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
                 <CardHeader>
                   <CardTitle className="text-2xl flex items-center gap-2">
                     <CheckCircle className="h-6 w-6 text-green-600" />
-                    What you'll learn
+                    What you&apos;ll learn
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

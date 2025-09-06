@@ -1,4 +1,4 @@
-import { Video, Search, Filter } from "lucide-react";
+import { Video, CheckCircle, Edit } from "lucide-react";
 import { db } from "@/lib/db";
 import {
   Table,
@@ -12,10 +12,17 @@ import { Badge } from "@/components/ui/badge";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Pagination } from "@/components/pagination";
 import { CourseFilters } from "./_components/course-filters";
 import { CourseActions } from "./_components/course-actions";
+import { Prisma } from "@prisma/client";
 
 const COURSES_PER_PAGE = 10;
 
@@ -25,32 +32,33 @@ export default async function ManageCoursesPage({
   searchParams: {
     page?: string;
     search?: string;
-    status?: "published" | "draft" | "all";
+    status?: "published" | "draft";
   };
 }) {
-  const { page, search, status } = await searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "ADMIN")
     return redirect("/dashboard");
-
+  const { search, status, page } = await searchParams;
   const currentPage = Number(page) || 1;
   const searchTerm = search || "";
   const statusFilter = status;
 
-  // --- Construct Prisma Where Clause ---
-  const whereClause: any = {
+  const whereClause: Prisma.CourseWhereInput = {
     AND: [
-      {
-        OR: [
-          { title: { contains: searchTerm, mode: "insensitive" } },
-          {
-            instructor: { name: { contains: searchTerm, mode: "insensitive" } },
-          },
-        ],
-      },
-      statusFilter && statusFilter !== "all"
-        ? { isPublished: statusFilter === "published" }
+      searchTerm
+        ? {
+            OR: [
+              { title: { contains: searchTerm, mode: "insensitive" } },
+              {
+                instructor: {
+                  name: { contains: searchTerm, mode: "insensitive" },
+                },
+              },
+            ],
+          }
         : {},
+
+      statusFilter ? { isPublished: statusFilter === "published" } : {},
     ],
   };
 
@@ -67,10 +75,10 @@ export default async function ManageCoursesPage({
   const pageCount = Math.ceil(totalCourses / COURSES_PER_PAGE);
 
   // --- Stats ---
-  const allCoursesCount = await db.course.count();
-  const publishedCount = await db.course.count({
-    where: { isPublished: true },
-  });
+  const [allCoursesCount, publishedCount] = await Promise.all([
+    db.course.count(),
+    db.course.count({ where: { isPublished: true } }),
+  ]);
   const draftCount = allCoursesCount - publishedCount;
 
   return (
@@ -113,15 +121,13 @@ export default async function ManageCoursesPage({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Published Courses
-                </p>
+                <p className="text-sm font-medium text-gray-600">Published</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {publishedCount}
                 </p>
               </div>
               <div className="p-3 bg-green-100 rounded-full">
-                <Filter className="h-6 w-6 text-green-600" />
+                <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
             </div>
           </CardContent>
@@ -130,13 +136,11 @@ export default async function ManageCoursesPage({
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Draft Courses
-                </p>
+                <p className="text-sm font-medium text-gray-600">Drafts</p>
                 <p className="text-2xl font-bold text-gray-900">{draftCount}</p>
               </div>
               <div className="p-3 bg-gray-100 rounded-full">
-                <Search className="h-6 w-6 text-gray-600" />
+                <Edit className="h-6 w-6 text-gray-600" />
               </div>
             </div>
           </CardContent>
@@ -153,10 +157,14 @@ export default async function ManageCoursesPage({
       {/* Courses Table */}
       <Card className="border-0 shadow-lg">
         <CardHeader>
-          <CardTitle>All Courses ({totalCourses} matching)</CardTitle>
+          <CardTitle>All Courses</CardTitle>
+          <CardDescription>
+            {totalCourses} course{totalCourses !== 1 ? "s" : ""} matching
+            filters
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="rounded-lg border">
+        <CardContent className="p-0">
+          <div className="rounded-lg overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
@@ -170,7 +178,7 @@ export default async function ManageCoursesPage({
               <TableBody>
                 {courses.map((course) => (
                   <TableRow key={course.id} className="hover:bg-gray-50/50">
-                    <TableCell className="pl-6 font-medium">
+                    <TableCell className="pl-6 font-medium text-gray-800">
                       {course.title}
                     </TableCell>
                     <TableCell>{course.instructor?.name || "N/A"}</TableCell>
@@ -179,12 +187,7 @@ export default async function ManageCoursesPage({
                     </TableCell>
                     <TableCell>
                       <Badge
-                        variant="outline"
-                        className={
-                          course.isPublished
-                            ? "bg-green-50 text-green-700 border-green-200"
-                            : "bg-gray-100 text-gray-700 border-gray-200"
-                        }
+                        variant={course.isPublished ? "default" : "secondary"}
                       >
                         {course.isPublished ? "Published" : "Draft"}
                       </Badge>
@@ -201,7 +204,7 @@ export default async function ManageCoursesPage({
             </Table>
           </div>
           {courses.length === 0 && (
-            <div className="text-center py-12">
+            <div className="text-center py-16">
               <Video className="h-16 w-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 No courses found

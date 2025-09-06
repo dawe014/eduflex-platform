@@ -156,7 +156,7 @@ export default async function HomePage() {
               ?
             </h2>
             <p className="text-xl text-gray-700">
-              We're committed to providing the best learning experience
+              We&apos;re committed to providing the best learning experience
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -213,7 +213,7 @@ export default async function HomePage() {
               Say
             </h2>
             <p className="text-xl text-gray-700">
-              Don't just take our word for it - hear from our community
+              Don&apos;t just take our word for it - hear from our community
             </p>
           </div>
 

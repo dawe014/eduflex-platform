@@ -44,6 +44,7 @@ export async function PATCH(req: Request) {
 
     return new NextResponse("Password updated successfully", { status: 200 });
   } catch (error) {
+    console.error("[CHANGE_PASSWORD]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

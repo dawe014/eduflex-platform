@@ -9,10 +9,9 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import { cn } from "@/lib/utils";
-import { Grip, Pencil, Clock, Eye, EyeOff, Crown } from "lucide-react";
+import { Grip, Pencil, Eye, EyeOff, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 
 interface LessonsListProps {

@@ -3,7 +3,7 @@
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ImageIcon, Pencil, PlusCircle, X, Check } from "lucide-react";
+import { ImageIcon, Pencil, PlusCircle, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Course } from "@prisma/client";

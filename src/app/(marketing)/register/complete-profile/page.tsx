@@ -17,11 +17,11 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
+import { UserRole } from "@prisma/client";
 export default async function CompleteProfilePage() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user || session.user.role !== ("NEW_USER" as any)) {
+  if (!session?.user || session.user.role !== UserRole.NEW_USER) {
     return redirect("/");
   }
 
@@ -39,8 +39,8 @@ export default async function CompleteProfilePage() {
             </h1>
           </div>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            We're excited to have you, {session.user.name}! Let's personalize
-            your learning journey.
+            We&apos;re excited to have you, {session.user.name}! Let&apos;s
+            personalize your learning journey.
           </p>
         </div>
 
@@ -57,8 +57,8 @@ export default async function CompleteProfilePage() {
                 </CardTitle>
               </div>
               <CardDescription className="text-blue-100">
-                Select how you'd like to use EduFlex. You can always update this
-                later.
+                Select how you&apos;d like to use EduFlex. You can always update
+                this later.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-8">

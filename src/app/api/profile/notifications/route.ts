@@ -20,6 +20,7 @@ export async function PATCH(req: Request) {
 
     return new NextResponse("Notification settings updated", { status: 200 });
   } catch (error) {
+    console.error("[NOTIFICATIONS_PATCH]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

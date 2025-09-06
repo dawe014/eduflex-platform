@@ -38,6 +38,8 @@ export async function PUT(
 
     return new NextResponse("Success", { status: 200 });
   } catch (error) {
+    console.error("[LESSON_REORDER]", error);
+
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

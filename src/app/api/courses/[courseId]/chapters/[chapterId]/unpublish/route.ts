@@ -60,6 +60,7 @@ export async function PATCH(
 
     return NextResponse.json(unpublishedChapter);
   } catch (error) {
+    console.error("[UNPUBLISH_CHAPTER]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

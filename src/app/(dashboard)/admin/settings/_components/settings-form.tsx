@@ -16,7 +16,7 @@ import {
   updatePlatformSettings,
 } from "@/actions/settings-actions";
 import { toast } from "sonner";
-import { Settings } from "lucide-react";
+import { Settings, Loader2 } from "lucide-react";
 
 interface SettingsFormProps {
   initialSettings: PlatformSettings;
@@ -31,8 +31,12 @@ export const SettingsForm = ({ initialSettings }: SettingsFormProps) => {
       try {
         const result = await updatePlatformSettings(settings);
         toast.success(result.message);
-      } catch (error: any) {
-        toast.error(error.message || "Something went wrong.");
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
       }
     });
   };
@@ -49,7 +53,7 @@ export const SettingsForm = ({ initialSettings }: SettingsFormProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex items-center justify-between space-x-2 p-4 rounded-lg bg-gray-50">
+        <div className="flex items-center justify-between space-x-2 p-4 rounded-lg bg-gray-50 border">
           <Label
             htmlFor="new-registrations"
             className="flex flex-col space-y-1 cursor-pointer"
@@ -70,7 +74,7 @@ export const SettingsForm = ({ initialSettings }: SettingsFormProps) => {
           />
         </div>
 
-        <div className="flex items-center justify-between space-x-2 p-4 rounded-lg bg-gray-50">
+        <div className="flex items-center justify-between space-x-2 p-4 rounded-lg bg-gray-50 border">
           <Label
             htmlFor="new-courses"
             className="flex flex-col space-y-1 cursor-pointer"
@@ -95,9 +99,16 @@ export const SettingsForm = ({ initialSettings }: SettingsFormProps) => {
           <Button
             onClick={onSave}
             disabled={isPending}
-            className="bg-gray-900 hover:bg-gray-950"
+            className="bg-blue-600 hover:bg-blue-700"
           >
-            {isPending ? "Saving..." : "Save Settings"}
+            {isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save Settings"
+            )}
           </Button>
         </div>
       </CardContent>

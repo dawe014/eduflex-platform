@@ -47,6 +47,7 @@ export async function POST(
 
     return NextResponse.json(review);
   } catch (error) {
+    console.error("[COURSE_REVIEW_POST]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
