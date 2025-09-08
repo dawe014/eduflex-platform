@@ -5,11 +5,11 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
-    const { courseId } = params;
+    const { courseId } = await params;
 
     // 1. Authentication: Check if user is logged in
     if (!session?.user) {

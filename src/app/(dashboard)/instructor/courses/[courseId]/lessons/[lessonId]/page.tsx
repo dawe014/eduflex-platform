@@ -28,20 +28,21 @@ import { LessonDurationForm } from "./_components/lesson-duration-form";
 export default async function LessonIdPage({
   params,
 }: {
-  params: { courseId: string; lessonId: string };
+  params: Promise<{ courseId: string; lessonId: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "INSTRUCTOR") {
     return redirect("/");
   }
 
+  // ✅ Await params properly
   const { courseId, lessonId } = await params;
 
   const lesson = await db.lesson.findUnique({
     where: {
       id: lessonId,
       chapter: {
-        courseId: courseId,
+        courseId,
         course: {
           instructorId: session.user.id,
         },
@@ -64,9 +65,7 @@ export default async function LessonIdPage({
     },
   });
 
-  if (!lesson) {
-    return notFound();
-  }
+  if (!lesson) return notFound();
 
   const chapterId = lesson.chapter.id;
 

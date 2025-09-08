@@ -12,7 +12,7 @@ import { SearchBar } from "./_components/search-bar";
 export default async function MyLearningPage({
   searchParams,
 }: {
-  searchParams: { search?: string };
+  searchParams: Promise<{ search?: string }>;
 }) {
   const { search } = await searchParams;
   const session = await getServerSession(authOptions);

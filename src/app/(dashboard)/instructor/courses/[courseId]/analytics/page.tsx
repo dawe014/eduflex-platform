@@ -67,11 +67,14 @@ const groupEnrollmentsByMonth = (
 export default async function CourseAnalyticsPage({
   params,
 }: {
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return redirect("/");
+
+  // ✅ Await the params
   const { courseId } = await params;
+
   const course = await db.course.findUnique({
     where: {
       id: courseId,
@@ -95,9 +98,7 @@ export default async function CourseAnalyticsPage({
     },
   });
 
-  if (!course) {
-    return notFound();
-  }
+  if (!course) return notFound();
 
   const totalStudents = course.enrollments.length;
   const totalRevenue = (course.price || 0) * totalStudents;

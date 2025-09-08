@@ -40,7 +40,7 @@ const COURSES_PER_PAGE = 5;
 export default async function InstructorCoursesPage({
   searchParams,
 }: {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return redirect("/");

@@ -5,11 +5,11 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   req: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
-    const { courseId } = params;
+    const { courseId } = await params;
     const { rating, comment } = await req.json();
 
     if (!session?.user) {

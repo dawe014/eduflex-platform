@@ -22,9 +22,9 @@ import { Progress } from "@/components/ui/progress";
 export default async function CourseStudentsPage({
   params,
 }: {
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }) {
-  const { courseId } = await params;
+  const { courseId } = await params; // <-- remove await
   const session = await getServerSession(authOptions);
   if (!session?.user) return redirect("/");
 
@@ -35,9 +35,7 @@ export default async function CourseStudentsPage({
     },
     include: {
       enrollments: {
-        include: {
-          user: true,
-        },
+        include: { user: true },
         orderBy: { createdAt: "desc" },
       },
       chapters: {
@@ -45,21 +43,14 @@ export default async function CourseStudentsPage({
         include: {
           lessons: {
             where: { isPublished: true },
-
-            include: {
-              progress: {
-                where: { isCompleted: true },
-              },
-            },
+            include: { progress: { where: { isCompleted: true } } },
           },
         },
       },
     },
   });
 
-  if (!course) {
-    return notFound();
-  }
+  if (!course) return notFound();
 
   const totalStudents = course.enrollments.length;
   const totalLessons = course.chapters.reduce(
@@ -86,7 +77,6 @@ export default async function CourseStudentsPage({
     };
   });
 
-  // Calculate aggregate stats
   const averageProgress =
     totalStudents > 0
       ? studentsWithProgress.reduce(

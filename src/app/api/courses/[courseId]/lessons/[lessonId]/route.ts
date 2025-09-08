@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { courseId: string; lessonId: string } }
+  { params }: { params: Promise<{ courseId: string; lessonId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -38,7 +38,7 @@ export async function PATCH(
 // DELETE method for deleting a lesson
 export async function DELETE(
   req: Request,
-  { params }: { params: { courseId: string; lessonId: string } }
+  { params }: { params: Promise<{ courseId: string; lessonId: string }> }
 ) {
   try {
     const { courseId, lessonId } = await params;

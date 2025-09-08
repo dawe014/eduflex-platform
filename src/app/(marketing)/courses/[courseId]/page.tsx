@@ -22,7 +22,7 @@ import {
 } from "@/lib/duration-helper";
 
 interface CourseIdPageProps {
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }
 
 export default async function CourseIdPage({ params }: CourseIdPageProps) {

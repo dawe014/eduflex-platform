@@ -17,10 +17,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Prisma } from "@prisma/client";
 interface BrowseCoursesPageProps {
-  searchParams: {
+  searchParams: Promise<{
     search?: string;
     categoryId?: string;
-  };
+  }>;
 }
 
 export default async function BrowseCoursesPage({

@@ -5,11 +5,12 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { courseId: string; chapterId: string } }
+  { params }: { params: Promise<{ courseId: string; chapterId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
 
+    const { courseId, chapterId } = await params;
     // 1. Authentication Check
     if (!session?.user || session.user.role !== "INSTRUCTOR") {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -18,7 +19,7 @@ export async function PATCH(
     // 2. Authorization Check
     const courseOwner = await db.course.findUnique({
       where: {
-        id: params.courseId,
+        id: courseId,
         instructorId: session.user.id,
       },
     });
@@ -30,8 +31,8 @@ export async function PATCH(
     // 3. Update the chapter to be unpublished
     const unpublishedChapter = await db.chapter.update({
       where: {
-        id: params.chapterId,
-        courseId: params.courseId,
+        id: chapterId,
+        courseId: courseId,
       },
       data: {
         isPublished: false,
@@ -42,7 +43,7 @@ export async function PATCH(
 
     const publishedChaptersInCourse = await db.chapter.findMany({
       where: {
-        courseId: params.courseId,
+        courseId: courseId,
         isPublished: true,
       },
     });
@@ -50,7 +51,7 @@ export async function PATCH(
     if (publishedChaptersInCourse.length === 0) {
       await db.course.update({
         where: {
-          id: params.courseId,
+          id: courseId,
         },
         data: {
           isPublished: false,

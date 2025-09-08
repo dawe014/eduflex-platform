@@ -26,41 +26,35 @@ import { Badge } from "@/components/ui/badge";
 export default async function ChapterIdPage({
   params,
 }: {
-  params: { courseId: string; chapterId: string };
+  params: Promise<{ courseId: string; chapterId: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "INSTRUCTOR") {
     return redirect("/");
   }
 
+  // ✅ Await the params
   const { courseId, chapterId } = await params;
 
   const chapter = await db.chapter.findUnique({
     where: {
       id: chapterId,
-      courseId: courseId,
+      courseId,
       course: {
         instructorId: session.user.id,
       },
     },
     include: {
       lessons: {
-        orderBy: {
-          position: "asc",
-        },
+        orderBy: { position: "asc" },
       },
       course: {
-        select: {
-          title: true,
-          enrollments: true,
-        },
+        select: { title: true, enrollments: true },
       },
     },
   });
 
-  if (!chapter) {
-    return notFound();
-  }
+  if (!chapter) return notFound();
 
   const requiredFields = [chapter.title, chapter.description];
   const totalFields = requiredFields.length;

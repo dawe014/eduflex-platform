@@ -28,12 +28,14 @@ import { IncludesForm } from "./_components/includes-form";
 export default async function InstructorCourseIdPage({
   params,
 }: {
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "INSTRUCTOR") {
     return redirect("/");
   }
+
+  // ✅ Await params properly
   const { courseId } = await params;
 
   const course = await db.course.findUnique({
@@ -43,17 +45,11 @@ export default async function InstructorCourseIdPage({
     },
     include: {
       chapters: {
-        orderBy: {
-          position: "asc",
-        },
+        orderBy: { position: "asc" },
         include: {
           lessons: {
-            where: {
-              isPublished: true,
-            },
-            orderBy: {
-              position: "asc",
-            },
+            where: { isPublished: true },
+            orderBy: { position: "asc" },
           },
         },
       },
@@ -62,9 +58,7 @@ export default async function InstructorCourseIdPage({
     },
   });
 
-  if (!course) {
-    return notFound();
-  }
+  if (!course) return notFound();
 
   const categories = await db.category.findMany({
     orderBy: {

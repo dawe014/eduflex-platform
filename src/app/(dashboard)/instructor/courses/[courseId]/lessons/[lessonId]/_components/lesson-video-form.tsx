@@ -14,7 +14,6 @@ import { Progress } from "@/components/ui/progress";
 interface LessonVideoFormProps {
   initialData: Lesson;
   courseId: string;
-  chapterId: string;
   lessonId: string;
 }
 

@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { courseId: string; lessonId: string } }
+  { params }: { params: Promise<{ courseId: string; lessonId: string }> }
 ) {
   try {
     const { courseId, lessonId } = await params;

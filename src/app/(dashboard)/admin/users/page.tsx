@@ -31,17 +31,21 @@ const USERS_PER_PAGE = 10;
 export default async function ManageUsersPage({
   searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     search?: string;
     role?: UserRole;
     sort?: string;
-  };
+  }>;
 }) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN")
+  if (!session?.user || session.user.role !== "ADMIN") {
     return redirect("/dashboard");
+  }
+
+  // ✅ Await the promise
   const { page, search, role, sort } = await searchParams;
+
   const currentPage = Number(page) || 1;
   const searchTerm = search || "";
   const roleFilter = role || "all";

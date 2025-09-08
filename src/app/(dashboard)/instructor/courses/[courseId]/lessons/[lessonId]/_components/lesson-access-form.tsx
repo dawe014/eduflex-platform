@@ -23,7 +23,6 @@ import { Badge } from "@/components/ui/badge";
 interface LessonAccessFormProps {
   initialData: Lesson;
   courseId: string;
-  chapterId: string;
   lessonId: string;
 }
 

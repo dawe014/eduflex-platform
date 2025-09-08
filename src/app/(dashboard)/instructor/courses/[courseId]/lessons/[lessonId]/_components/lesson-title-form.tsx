@@ -22,7 +22,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 interface LessonTitleFormProps {
   initialData: Lesson;
   courseId: string;
-  chapterId: string;
   lessonId: string;
 }
 

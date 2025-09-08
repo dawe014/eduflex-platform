@@ -38,16 +38,20 @@ const MESSAGES_PER_PAGE = 10;
 export default async function AdminMessagesPage({
   searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     status?: MessageStatus | "all";
     search?: string;
-  };
+  }>;
 }) {
   const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN")
+  if (!session?.user || session.user.role !== "ADMIN") {
     return redirect("/dashboard");
+  }
+
+  // ✅ must await the promise
   const { page, status, search } = await searchParams;
+
   const currentPage = Number(page) || 1;
   const statusFilter = status;
   const searchTerm = search || "";
@@ -68,13 +72,24 @@ export default async function AdminMessagesPage({
   };
 
   // --- Fetch Data ---
-  const messages = await db.contactMessage.findMany({
+  const messagesRaw = await db.contactMessage.findMany({
     where: whereClause,
     include: { user: { select: { name: true, image: true } } },
     orderBy: { createdAt: "desc" },
     skip: (currentPage - 1) * MESSAGES_PER_PAGE,
     take: MESSAGES_PER_PAGE,
   });
+
+  // Ensure user.name is always a string (never null)
+  const messages = messagesRaw.map((msg) => ({
+    ...msg,
+    user: msg.user
+      ? {
+          ...msg.user,
+          name: msg.user.name ?? "",
+        }
+      : null,
+  }));
 
   const filteredCount = await db.contactMessage.count({ where: whereClause });
   const pageCount = Math.ceil(filteredCount / MESSAGES_PER_PAGE);

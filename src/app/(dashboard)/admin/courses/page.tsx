@@ -9,9 +9,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -29,19 +26,19 @@ const COURSES_PER_PAGE = 10;
 export default async function ManageCoursesPage({
   searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     search?: string;
     status?: "published" | "draft";
-  };
+  }>;
 }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN")
-    return redirect("/dashboard");
-  const { search, status, page } = await searchParams;
+  // ✅ Await searchParams because it's a Promise now
+  const { page, search, status } = await searchParams;
+
   const currentPage = Number(page) || 1;
   const searchTerm = search || "";
-  const statusFilter = status;
+  const statusFilter =
+    status === "published" || status === "draft" ? status : undefined;
 
   const whereClause: Prisma.CourseWhereInput = {
     AND: [
@@ -57,7 +54,6 @@ export default async function ManageCoursesPage({
             ],
           }
         : {},
-
       statusFilter ? { isPublished: statusFilter === "published" } : {},
     ],
   };
@@ -101,48 +97,30 @@ export default async function ManageCoursesPage({
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Total Courses
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {allCoursesCount}
-                </p>
-              </div>
-              <div className="p-3 bg-blue-100 rounded-full">
-                <Video className="h-6 w-6 text-blue-600" />
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
+            <Video className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{allCoursesCount}</div>
           </CardContent>
         </Card>
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Published</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {publishedCount}
-                </p>
-              </div>
-              <div className="p-3 bg-green-100 rounded-full">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Published</CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{publishedCount}</div>
           </CardContent>
         </Card>
         <Card className="border-0 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Drafts</p>
-                <p className="text-2xl font-bold text-gray-900">{draftCount}</p>
-              </div>
-              <div className="p-3 bg-gray-100 rounded-full">
-                <Edit className="h-6 w-6 text-gray-600" />
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Drafts</CardTitle>
+            <Edit className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{draftCount}</div>
           </CardContent>
         </Card>
       </div>
