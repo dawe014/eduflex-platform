@@ -229,8 +229,8 @@ export const Footer = () => {
           </div>
           <div className="flex items-center text-gray-500 text-sm">
             Made with{" "}
-            <Heart className="h-4 w-4 mx-1 text-red-500 fill-current" /> by the
-            EduFlex team
+            <Heart className="h-4 w-4 mx-1 text-red-500 fill-current" /> by
+            Dawit Tamiru
           </div>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link
