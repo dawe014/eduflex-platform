@@ -13,14 +13,14 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Users, Clock, BookOpen, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WishlistButton } from "./wishlist-button";
-import { Course, Category, Review, Enrollment, Lesson } from "@prisma/client";
+import { Course, Category, Review, Enrollment, Lesson, Chapter } from "@prisma/client";
 import { calculateTotalCourseDuration } from "@/lib/duration-helper";
 
 type CourseWithDetails = Course & {
   category: Category | null;
   reviews: Review[];
   enrollments: Enrollment[];
-  chapters: { lessons: Lesson[] }[];
+  chapters: (Chapter & { lessons: Lesson[] })[];
 };
 
 interface CourseCardProps {

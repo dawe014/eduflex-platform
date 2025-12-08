@@ -50,7 +50,6 @@ export default async function WishlistPage() {
   });
 
   const totalWishlisted = wishlistItems.length;
-  console.log(wishlistItems);
   const totalPrice = wishlistItems.reduce(
     (sum, item) => sum + (item.course.price || 0),
     0

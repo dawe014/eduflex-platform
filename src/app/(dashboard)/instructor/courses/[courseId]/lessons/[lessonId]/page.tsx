@@ -28,7 +28,7 @@ import { LessonDurationForm } from "./_components/lesson-duration-form";
 export default async function LessonIdPage({
   params,
 }: {
-  params: { courseId: string; lessonId: string };
+  params: Promise<{ courseId: string; lessonId: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "INSTRUCTOR") {
@@ -209,11 +209,13 @@ export default async function LessonIdPage({
                 <LessonTitleForm
                   initialData={lesson}
                   courseId={courseId}
+                  chapterId={chapterId}
                   lessonId={lessonId}
                 />
                 <LessonDescriptionForm
                   initialData={lesson}
                   courseId={courseId}
+                  chapterId={chapterId}
                   lessonId={lessonId}
                 />
                 <LessonDurationForm
@@ -236,6 +238,7 @@ export default async function LessonIdPage({
               <LessonAccessForm
                 initialData={lesson}
                 courseId={courseId}
+                chapterId={chapterId}
                 lessonId={lessonId}
               />
             </CardContent>
@@ -255,6 +258,7 @@ export default async function LessonIdPage({
               <LessonVideoForm
                 initialData={lesson}
                 courseId={courseId}
+                chapterId={chapterId}
                 lessonId={lessonId}
               />
             </CardContent>

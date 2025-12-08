@@ -36,7 +36,7 @@ export const Navbar = () => {
 
         {/* Mobile Navigation */}
         <div className="lg:hidden flex items-center gap-3">
-          <UserButton mobile />
+          <UserButton />
           <MobileNav />
         </div>
       </div>

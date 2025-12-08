@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { getPlatformSettings } from "@/actions/settings-actions";
 import { SettingsForm } from "./_components/settings-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminSettingsPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "ADMIN")

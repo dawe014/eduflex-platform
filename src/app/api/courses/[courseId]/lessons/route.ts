@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   req: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -27,7 +27,9 @@ export async function POST(
     // 1. Find the last lesson to determine the new position
     const lastLesson = await db.lesson.findFirst({
       where: {
-        courseId: courseId,
+        chapter: {
+          courseId: courseId,
+        },
       },
       orderBy: {
         position: "desc",
@@ -39,10 +41,22 @@ export async function POST(
     // If there are no lessons yet, the new position is 1.
     const newPosition = lastLesson ? lastLesson.position + 1 : 1;
 
+    // 3. Get the first chapter of the course to add the lesson to
+    const firstChapter = await db.chapter.findFirst({
+      where: { courseId: courseId },
+      orderBy: { position: "asc" },
+    });
+
+    if (!firstChapter) {
+      return new NextResponse("No chapters found. Create a chapter first.", {
+        status: 400,
+      });
+    }
+
     const lesson = await db.lesson.create({
       data: {
         title,
-        courseId: courseId,
+        chapterId: firstChapter.id,
         position: newPosition,
       },
     });

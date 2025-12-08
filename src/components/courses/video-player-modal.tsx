@@ -9,6 +9,7 @@ import {
 import ReactPlayer from "react-player";
 import { Play } from "lucide-react";
 import { useEffect, useState } from "react";
+import { ReactPlayerProps } from "react-player/types";
 
 interface VideoPlayerModalProps {
   isOpen: boolean;
@@ -59,13 +60,15 @@ export const VideoPlayerModal = ({
                   </div>
                 }
                 light={false}
-                config={{
-                  file: {
-                    attributes: {
-                      controlsList: "nodownload",
+                config={
+                  {
+                    file: {
+                      attributes: {
+                        controlsList: "nodownload",
+                      },
                     },
-                  },
-                }}
+                  } as ReactPlayerProps["config"]
+                }
               />
             )}
           </div>

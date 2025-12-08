@@ -19,6 +19,8 @@ import { CourseCard } from "@/components/courses/course-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { HeroSlider } from "@/components/layout/hero-slider";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
 
@@ -303,7 +305,7 @@ export default async function HomePage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="px-8 py-3 text-lg border-white text-white hover:bg-white/10"
+                className="px-8 py-3 text-lg border-white text-blue-600 hover:bg-white/10"
                 asChild
               >
                 <Link href="/instructor/guide">Learn How It Works</Link>

@@ -10,7 +10,7 @@ const CourseLearnLayout = async ({
   params,
 }: {
   children: React.ReactNode;
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }) => {
   const session = await getServerSession(authOptions);
   if (!session?.user) return redirect("/");

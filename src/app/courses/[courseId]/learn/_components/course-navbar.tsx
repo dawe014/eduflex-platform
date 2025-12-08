@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 
 type CourseWithDetails = Course & {
   chapters: (Chapter & { lessons: Lesson[] })[];
-  instructor: { name: string; image?: string | null };
+  instructor: { name: string | null; image?: string | null };
 };
 
 interface CourseNavbarProps {

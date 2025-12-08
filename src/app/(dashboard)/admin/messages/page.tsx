@@ -38,11 +38,11 @@ const MESSAGES_PER_PAGE = 10;
 export default async function AdminMessagesPage({
   searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     status?: MessageStatus | "all";
     search?: string;
-  };
+  }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "ADMIN")

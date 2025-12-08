@@ -26,7 +26,7 @@ interface PriceFormProps {
 }
 
 const formSchema = z.object({
-  price: z.coerce.number().min(0, "Price must be positive"),
+  price: z.number().min(0, "Price must be positive"),
 });
 
 export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
@@ -122,6 +122,9 @@ export const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
                           placeholder="0.00"
                           className="pl-10 text-lg font-medium"
                           {...field}
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber || 0)
+                          }
                         />
                       </div>
                     </FormControl>

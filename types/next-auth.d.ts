@@ -8,10 +8,21 @@ declare module "next-auth" {
       role: UserRole;
     } & DefaultSession["user"];
   }
+
+  interface User {
+    role: UserRole;
+  }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     role?: UserRole;
+    id?: string;
+  }
+}
+
+declare module "@next-auth/prisma-adapter" {
+  interface AdapterUser {
+    role: UserRole;
   }
 }

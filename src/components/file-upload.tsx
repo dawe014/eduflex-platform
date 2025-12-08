@@ -2,22 +2,40 @@
 
 import { UploadDropzone } from "@/lib/uploadthing";
 import { toast } from "sonner";
+import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
 interface FileUploadProps {
   onChange: (url?: string) => void;
-  endpoint: string;
+  endpoint: keyof OurFileRouter;
+  onUploadStart?: () => void;
+  onUploadEnd?: () => void;
+  onUploadProgress?: (progress: number) => void;
 }
 
-export const FileUpload = ({ onChange, endpoint }: FileUploadProps) => {
+export const FileUpload = ({
+  onChange,
+  endpoint,
+  onUploadStart,
+  onUploadEnd,
+  onUploadProgress,
+}: FileUploadProps) => {
   return (
     <div className="relative">
       <UploadDropzone
         endpoint={endpoint}
+        onUploadBegin={() => {
+          onUploadStart?.();
+        }}
+        onUploadProgress={(progress) => {
+          onUploadProgress?.(progress);
+        }}
         onClientUploadComplete={(res) => {
           onChange(res?.[0]?.url);
+          onUploadEnd?.();
         }}
         onUploadError={(error: Error) => {
           toast.error(error?.message || "File upload failed");
+          onUploadEnd?.();
         }}
         appearance={{
           container: {
@@ -45,7 +63,7 @@ export const FileUpload = ({ onChange, endpoint }: FileUploadProps) => {
             "--ut-uploading-after": {
               backgroundColor: "#60a5fa",
             },
-          },
+          } as React.CSSProperties,
           label: {
             color: "#4b5563",
             fontSize: "1.125rem",

@@ -26,7 +26,7 @@ import { Badge } from "@/components/ui/badge";
 export default async function ChapterIdPage({
   params,
 }: {
-  params: { courseId: string; chapterId: string };
+  params: Promise<{ courseId: string; chapterId: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "INSTRUCTOR") {

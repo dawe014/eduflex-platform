@@ -22,7 +22,7 @@ import {
 } from "@/lib/duration-helper";
 
 interface CourseIdPageProps {
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }
 
 export default async function CourseIdPage({ params }: CourseIdPageProps) {
@@ -98,8 +98,12 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
         reviewCount
       : 0;
 
-  const previewLesson =
-    allLessons.find((lesson) => lesson.isFree && lesson.videoUrl) || null;
+  const foundLesson = allLessons.find(
+    (lesson) => lesson.isFree && lesson.videoUrl
+  );
+  const previewLesson = foundLesson
+    ? { title: foundLesson.title, videoUrl: foundLesson.videoUrl! }
+    : null;
 
   let isEnrolled = false;
   let isWishlisted = false;
@@ -119,7 +123,6 @@ export default async function CourseIdPage({ params }: CourseIdPageProps) {
         totalLessons={totalLessons}
         averageRating={averageRating}
         previewLesson={previewLesson}
-        totalDuration={totalDuration}
       />
 
       <div className="container mx-auto px-4 py-8">

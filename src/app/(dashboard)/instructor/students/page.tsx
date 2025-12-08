@@ -21,7 +21,7 @@ const STUDENTS_PER_PAGE = 10;
 export default async function InstructorStudentsPage({
   searchParams,
 }: {
-  searchParams: { page?: string; search?: string };
+  searchParams: Promise<{ page?: string; search?: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return redirect("/");

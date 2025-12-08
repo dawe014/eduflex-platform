@@ -5,18 +5,19 @@ import { NextResponse } from "next/server";
 
 export async function PUT(
   req: Request,
-  { params }: { params: { courseId: string } }
+  { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user || session.user.role !== "INSTRUCTOR") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
+    const { courseId } = await params;
 
     const { list } = await req.json();
 
     const courseOwner = await db.course.findUnique({
-      where: { id: params.courseId, instructorId: session.user.id },
+      where: { id: courseId, instructorId: session.user.id },
     });
     if (!courseOwner) {
       return new NextResponse("Forbidden", { status: 403 });

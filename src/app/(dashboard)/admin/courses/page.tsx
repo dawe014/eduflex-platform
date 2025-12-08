@@ -29,11 +29,11 @@ const COURSES_PER_PAGE = 10;
 export default async function ManageCoursesPage({
   searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     search?: string;
     status?: "published" | "draft";
-  };
+  }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "ADMIN")

@@ -14,7 +14,7 @@ import Link from "next/link";
 export default async function CourseLearnRootPage({
   params,
 }: {
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }) {
   const { courseId } = await params;
 

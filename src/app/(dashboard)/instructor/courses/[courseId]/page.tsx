@@ -28,7 +28,7 @@ import { IncludesForm } from "./_components/includes-form";
 export default async function InstructorCourseIdPage({
   params,
 }: {
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session?.user || session.user.role !== "INSTRUCTOR") {

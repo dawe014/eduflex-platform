@@ -16,11 +16,14 @@ import { HeroSlider } from "@/components/layout/hero-slider";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Prisma } from "@prisma/client";
+
+export const dynamic = "force-dynamic";
+
 interface BrowseCoursesPageProps {
-  searchParams: {
+  searchParams: Promise<{
     search?: string;
     categoryId?: string;
-  };
+  }>;
 }
 
 export default async function BrowseCoursesPage({

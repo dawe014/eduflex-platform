@@ -22,7 +22,7 @@ import { Progress } from "@/components/ui/progress";
 export default async function CourseStudentsPage({
   params,
 }: {
-  params: { courseId: string };
+  params: Promise<{ courseId: string }>;
 }) {
   const { courseId } = await params;
   const session = await getServerSession(authOptions);

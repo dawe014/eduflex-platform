@@ -19,10 +19,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 interface LessonIdPageProps {
-  params: {
+  params: Promise<{
     courseId: string;
     lessonId: string;
-  };
+  }>;
 }
 
 export default async function LessonIdPage({ params }: LessonIdPageProps) {
@@ -299,7 +299,6 @@ export default async function LessonIdPage({ params }: LessonIdPageProps) {
             lessonId={lessonId}
             isCompleted={!!userProgress?.isCompleted}
             nextLessonId={nextLesson?.id}
-            variant="sm"
           />
           <Button
             variant="ghost"

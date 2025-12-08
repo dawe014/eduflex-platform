@@ -54,7 +54,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 type MessageWithUser = ContactMessage & {
-  user: { name: string; image: string | null } | null;
+  user: { name: string | null; image: string | null } | null;
 };
 
 export const MessageActions = ({ message }: { message: MessageWithUser }) => {
