@@ -1,8 +1,10 @@
 # 🎓 EduFlex – Full-Stack Online Learning Platform
 
-**[➡️ View Live Demo](https://[YOUR_VERCEL_APP_URL].vercel.app/)**
+**[➡️ View Live Demo](https://eduflex-platform.vercel.app/)**
 
-![EduFlex Platform Showcase](https://[LINK_TO_YOUR_PROJECT_GIF_OR_A_GOOD_SCREENSHOT].png)
+![EduFlex Platform Showcase](./docs/demo.gif)
+
+> **Note:** A comprehensive learning management system with role-based dashboards for students, instructors, and administrators.
 
 ---
 
