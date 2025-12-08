@@ -29,7 +29,7 @@ export async function PATCH(
     });
 
     return NextResponse.json(lesson);
-  } catch (error) {
+  } catch {
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
