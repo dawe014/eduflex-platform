@@ -186,7 +186,7 @@ export const Footer = () => {
             <ul className="space-y-4 mb-8">
               <li className="flex items-start">
                 <Mail className="h-5 w-5 text-green-400 mt-0.5 mr-3 flex-shrink-0" />
-                <span className="text-gray-400">dawittamiru014@gmail.com</span>
+                <span className="text-gray-400">info@eduflex.com</span>
               </li>
               <li className="flex items-start">
                 <Phone className="h-5 w-5 text-green-400 mt-0.5 mr-3 flex-shrink-0" />
@@ -228,9 +228,16 @@ export const Footer = () => {
             © {new Date().getFullYear()} EduFlex, Inc. All rights reserved.
           </div>
           <div className="flex items-center text-gray-500 text-sm">
-            Made with{" "}
-            <Heart className="h-4 w-4 mx-1 text-red-500 fill-current" /> by
-            Dawit Tamiru
+            Powered by{" "}
+            <a
+              href="https://milkiengineering.com"
+              className="mx-1 text-blue-500 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {" "}
+              Milki Engineering Technologies PLC
+            </a>
           </div>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <Link
